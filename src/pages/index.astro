@@ -1,0 +1,460 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const categories = [
+  {
+    name: 'Agentic Systems',
+    slug: 'agentic-systems',
+    count: 22,
+    description: 'Orchestration patterns, context isolation, model routing, evals, and governance for multi-agent systems.',
+  },
+  {
+    name: 'Stream Processing',
+    slug: 'stream-processing',
+    count: 2,
+    description: 'The primitives behind Kafka, Flink, and real-time data pipelines.',
+  },
+  {
+    name: 'Storage & Table Formats',
+    slug: 'storage-table-formats',
+    count: 2,
+    description: 'Iceberg, Delta Lake, Hudi — why table formats exist and when they matter.',
+  },
+  {
+    name: 'Orchestration',
+    slug: 'orchestration',
+    count: 2,
+    description: 'From cron jobs to DAGs to asset-centric pipelines.',
+  },
+  {
+    name: 'ML Infrastructure',
+    slug: 'ml-infrastructure',
+    count: 2,
+    description: 'Feature stores, training-serving skew, and the infrastructure behind production ML.',
+  },
+  {
+    name: 'Real-Time & OLAP',
+    slug: 'real-time-olap',
+    count: 2,
+    description: 'ClickHouse, Pinot, and the architecture of sub-second analytics.',
+  },
+  {
+    name: 'Observability & Quality',
+    slug: 'observability-quality',
+    count: 2,
+    description: 'Data health, lineage, and the five pillars of observable data systems.',
+  },
+  {
+    name: 'Platform Deep Dives',
+    slug: 'platform-deep-dives',
+    count: 16,
+    description: 'AWS, GCP, Azure, Snowflake, Databricks — honest comparisons and cost traps.',
+  },
+];
+---
+
+<Layout title="Porino" description="Infrastructure patterns and specialists for teams building multi-agent AI systems that actually work in production.">
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="hero-provocation">
+        Teams are rushing into multi-agent systems. The demos work.<br />
+        The production systems don't. The bottleneck is almost never the agent.
+      </p>
+      <h1 class="hero-headline">
+        The infrastructure layer<br />is what makes agents reliable.
+      </h1>
+      <p class="hero-sub">
+        Fan-out and fan-in. Idempotent tasks. Context isolation. Model routing.
+        Trace IDs across agent chains. Data governance. These are data engineering
+        primitives — and they're what separates a working agent system from a stalled pilot.
+      </p>
+      <div class="hero-actions">
+        <a href="/patterns/agentic-systems/foundations/data-layer-prerequisite-ai-agents" class="btn-primary">Read the thesis</a>
+        <a href="/patterns" class="btn-secondary">Browse patterns</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="thesis-strip">
+    <div class="section-inner">
+      <div class="strip-grid">
+        <div class="strip-item">
+          <span class="strip-label">The problem</span>
+          <span class="strip-text">LangGraph defaults and bloated shared context cause latency and hallucination — not the model</span>
+        </div>
+        <div class="strip-divider"></div>
+        <div class="strip-item">
+          <span class="strip-label">The insight</span>
+          <span class="strip-text">Data engineering primitives — idempotency, fan-in/out, observability — map directly to agent infrastructure</span>
+        </div>
+        <div class="strip-divider"></div>
+        <div class="strip-item">
+          <span class="strip-label">The implication</span>
+          <span class="strip-text">The teams shipping reliable agents are the ones who understand what sits underneath</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="patterns-section">
+    <div class="section-inner">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Patterns Library</h2>
+          <p class="section-subtitle">Agentic systems first. Data infrastructure underneath. Written for practitioners, not demos.</p>
+        </div>
+        <a href="/patterns" class="section-link">View all →</a>
+      </div>
+      <div class="category-grid">
+        {categories.map((cat) => (
+          <a href={`/patterns/${cat.slug}`} class="category-card">
+            <div class="category-top">
+              <span class="category-name">{cat.name}</span>
+              <span class="category-count">{cat.count}</span>
+            </div>
+            <p class="category-desc">{cat.description}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="newsletter-section">
+    <div class="section-inner">
+      <div class="newsletter-box">
+        <div class="newsletter-text">
+          <h3 class="newsletter-title">Written for people who build, not people who demo.</h3>
+          <p class="newsletter-desc">New patterns and research when there's something worth saying.</p>
+        </div>
+        <form class="newsletter-form">
+          <input type="email" placeholder="your@email.com" class="newsletter-input" />
+          <button type="submit" class="newsletter-btn">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hero {
+    padding: 96px 24px 80px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero-inner {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  .hero-provocation {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    line-height: 1.7;
+    margin: 0 0 28px;
+    font-style: italic;
+  }
+
+  .hero-headline {
+    font-size: 42px;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+    margin: 0 0 20px;
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0 0 36px;
+    max-width: 560px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-primary {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    background-color: var(--color-accent);
+    padding: 8px 16px;
+    border-radius: 5px;
+    transition: background-color 0.15s;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+  }
+
+  .btn-secondary {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    background-color: var(--color-surface-raised);
+    border: 1px solid var(--color-border);
+    padding: 8px 16px;
+    border-radius: 5px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .btn-secondary:hover {
+    color: var(--color-text-primary);
+    border-color: var(--color-text-tertiary);
+  }
+
+  .section-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .thesis-strip {
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+  }
+
+  .strip-grid {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .strip-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 28px 32px;
+  }
+
+  .strip-divider {
+    width: 1px;
+    background-color: var(--color-border);
+    flex-shrink: 0;
+  }
+
+  .strip-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+  }
+
+  .strip-text {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .section-subtitle {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    margin: 4px 0 0;
+  }
+
+  .entry-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background-color: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .entry-card {
+    background-color: var(--color-surface);
+    padding: 28px;
+    transition: background-color 0.15s;
+    display: block;
+  }
+
+  .entry-card:hover {
+    background-color: var(--color-surface-raised);
+  }
+
+  .entry-icon {
+    font-size: 18px;
+    color: var(--color-accent);
+    margin-bottom: 16px;
+  }
+
+  .entry-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: 6px;
+  }
+
+  .entry-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+  }
+
+  .entry-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .patterns-section {
+    padding: 64px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .section-link {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    transition: color 0.15s;
+  }
+
+  .section-link:hover {
+    color: var(--color-text-primary);
+  }
+
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background-color: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .category-card {
+    background-color: var(--color-surface);
+    padding: 20px;
+    display: block;
+    transition: background-color 0.15s;
+  }
+
+  .category-card:hover {
+    background-color: var(--color-surface-raised);
+  }
+
+  .category-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .category-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .category-count {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    background-color: var(--color-surface-raised);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .category-desc {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .newsletter-section {
+    padding: 64px 0;
+  }
+
+  .newsletter-box {
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background-color: var(--color-surface);
+    padding: 36px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+  }
+
+  .newsletter-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+
+  .newsletter-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    margin: 0;
+  }
+
+  .newsletter-form {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .newsletter-input {
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 8px 14px;
+    width: 220px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .newsletter-input::placeholder {
+    color: var(--color-text-tertiary);
+  }
+
+  .newsletter-input:focus {
+    border-color: var(--color-accent);
+  }
+
+  .newsletter-btn {
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-accent);
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+
+  .newsletter-btn:hover {
+    background-color: var(--color-accent-hover);
+  }
+</style>

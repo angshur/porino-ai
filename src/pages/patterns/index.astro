@@ -1,0 +1,222 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { patternsLibrary } from '../../data/content.js';
+
+const totalArticles = patternsLibrary.reduce(
+  (sum, cat) => sum + cat.subcategories.reduce((s, sub) => s + sub.articles.length, 0),
+  0
+);
+---
+
+<Layout title="Patterns Library" description="Infrastructure patterns for data and AI systems. Written for practitioners.">
+  <div class="page">
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="breadcrumb">Porino</div>
+        <h1 class="page-title">Patterns Library</h1>
+        <p class="page-desc">
+          Infrastructure patterns for data and AI systems. Agentic systems first —
+          because that's where the infrastructure gaps are hurting teams right now.
+        </p>
+        <div class="page-meta">{totalArticles} articles across {patternsLibrary.length} categories</div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="page-body-inner">
+        {patternsLibrary.map((category) => {
+          const articleCount = category.subcategories.reduce((s, sub) => s + sub.articles.length, 0);
+          const publishedCount = category.subcategories.reduce(
+            (s, sub) => s + sub.articles.filter((a) => a.status === 'published').length,
+            0
+          );
+          return (
+            <div class="category-row">
+              <div class="category-meta">
+                <a href={`/patterns/${category.slug}`} class="category-name">{category.category}</a>
+                <span class="category-count">{articleCount} articles</span>
+                {publishedCount > 0 && <span class="category-published">{publishedCount} published</span>}
+              </div>
+              <div class="subcategory-list">
+                {category.subcategories.map((sub) => (
+                  <div class="subcategory-row">
+                    <span class="subcategory-name">{sub.name}</span>
+                    <div class="article-list">
+                      {sub.articles.map((article) => (
+                        <a
+                          href={article.status === 'published' ? `/patterns/${category.slug}/${sub.slug}/${article.slug}` : '#'}
+                          class={`article-item ${article.status === 'planned' ? 'article-planned' : ''}`}
+                        >
+                          <span class="article-title">{article.title}</span>
+                          {article.status === 'planned' && <span class="article-tag">Coming</span>}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page {
+    min-height: 80vh;
+  }
+
+  .page-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 56px 24px 40px;
+  }
+
+  .page-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 12px;
+  }
+
+  .page-desc {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0 0 16px;
+    max-width: 560px;
+  }
+
+  .page-meta {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+  }
+
+  .page-body {
+    padding: 40px 24px;
+  }
+
+  .page-body-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .category-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 0;
+    border-bottom: 1px solid var(--color-border);
+    padding: 32px 0;
+  }
+
+  .category-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 32px;
+    padding-top: 2px;
+  }
+
+  .category-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    transition: color 0.15s;
+  }
+
+  .category-name:hover {
+    color: var(--color-accent);
+  }
+
+  .category-count {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+  }
+
+  .category-published {
+    font-size: 11px;
+    color: var(--color-accent);
+    background-color: rgba(94, 106, 210, 0.1);
+    border: 1px solid rgba(94, 106, 210, 0.2);
+    padding: 2px 6px;
+    border-radius: 3px;
+    width: fit-content;
+  }
+
+  .subcategory-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .subcategory-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .subcategory-name {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .article-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .article-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 7px 10px;
+    border-radius: 4px;
+    transition: background-color 0.15s;
+    gap: 12px;
+  }
+
+  .article-item:not(.article-planned):hover {
+    background-color: var(--color-surface-raised);
+  }
+
+  .article-title {
+    font-size: 13px;
+    color: var(--color-text-primary);
+  }
+
+  .article-planned .article-title {
+    color: var(--color-text-tertiary);
+  }
+
+  .article-tag {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    color: var(--color-text-tertiary);
+    background-color: var(--color-surface-raised);
+    padding: 2px 6px;
+    border-radius: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+</style>

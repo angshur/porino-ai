@@ -1,0 +1,200 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Replace with your Formspree form ID from formspree.io
+const CONSULT_FORM_ID = 'YOUR_CONSULT_FORM_ID';
+---
+
+<Layout title="Consulting" description="Multi-agent systems and data infrastructure consulting.">
+  <div class="page">
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="breadcrumb">Porino</div>
+        <h1 class="page-title">Consulting</h1>
+        <p class="page-desc">
+          I design and build multi-agent AI systems and data infrastructure for
+          SMB and enterprise teams. I focus on what ships — not what demos.
+        </p>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="page-body-inner">
+        <div class="two-col">
+          <div class="about-section">
+            <div class="section-label">How I work</div>
+            <div class="work-items">
+              <div class="work-item">
+                <div class="work-title">Data layer audit</div>
+                <div class="work-desc">Before building agents, I assess whether your data infrastructure can support autonomous systems. Most teams skip this. Most pilots fail.</div>
+              </div>
+              <div class="work-item">
+                <div class="work-title">Agent architecture design</div>
+                <div class="work-desc">Orchestration patterns, model routing, context isolation, fan-out/fan-in — designed for your specific workflow, not a generic template.</div>
+              </div>
+              <div class="work-item">
+                <div class="work-title">Implementation</div>
+                <div class="work-desc">I build the system, not just the plan. Claude SDK, LangGraph, or custom orchestration depending on what the problem actually needs.</div>
+              </div>
+              <div class="work-item">
+                <div class="work-title">Evaluation & reliability</div>
+                <div class="work-desc">Observability, trace IDs, evals, failure handling. The work that makes the difference between a demo and a system that runs in production.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="contact-section">
+            <div class="section-label">Book a call</div>
+            <p class="contact-desc">30 minutes. Tell me what you're trying to build. I'll tell you honestly whether it makes sense and where the infrastructure gaps are.</p>
+            <form class="form" action={`https://formspree.io/f/${CONSULT_FORM_ID}`} method="POST">
+              <input type="text" name="name" placeholder="Your name" class="input" />
+              <input type="email" name="email" placeholder="your@email.com" class="input" />
+              <input type="text" name="company" placeholder="Company / team" class="input" />
+              <textarea name="message" placeholder="What are you trying to build?" class="textarea" rows="4"></textarea>
+              <input type="hidden" name="_subject" value="New consulting request — Porino" />
+              <button type="submit" class="btn-primary">Request a call</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 56px 24px 40px;
+  }
+
+  .page-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 12px;
+  }
+
+  .page-desc {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0;
+    max-width: 560px;
+  }
+
+  .page-body {
+    padding: 48px 24px 80px;
+  }
+
+  .page-body-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+    margin-bottom: 24px;
+  }
+
+  .work-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .work-item {
+    padding: 20px 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .work-item:first-child {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .work-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 6px;
+  }
+
+  .work-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+
+  .contact-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0 0 20px;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .input, .textarea {
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 8px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    resize: vertical;
+  }
+
+  .input::placeholder, .textarea::placeholder {
+    color: var(--color-text-tertiary);
+  }
+
+  .input:focus, .textarea:focus {
+    border-color: var(--color-accent);
+  }
+
+  .btn-primary {
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-accent);
+    border: none;
+    border-radius: 5px;
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    margin-top: 4px;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+  }
+</style>

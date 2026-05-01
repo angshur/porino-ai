@@ -1,0 +1,183 @@
+---
+import Layout from '../../../../layouts/Layout.astro';
+import { patternsLibrary, getCategoryBySlug, getSubcategoryBySlug, getArticleBySlug, getAllArticlePaths } from '../../../../data/content.js';
+import { articles } from '../../../../data/articles.js';
+
+export function getStaticPaths() {
+  return getAllArticlePaths()
+    .filter(({ category, subcategory, slug }) => {
+      const article = getArticleBySlug(category, subcategory, slug);
+      return article?.status === 'published';
+    })
+    .map(({ category, subcategory, slug }) => ({
+      params: { category, subcategory, slug },
+    }));
+}
+
+const { category: categorySlug, subcategory: subcategorySlug, slug } = Astro.params;
+const category = getCategoryBySlug(categorySlug);
+const subcategory = getSubcategoryBySlug(categorySlug, subcategorySlug);
+const article = getArticleBySlug(categorySlug, subcategorySlug, slug);
+const content = articles[slug];
+---
+
+<Layout title={article.title} description={content?.description ?? article.title}>
+  <div class="article-page">
+    <div class="article-header">
+      <div class="article-header-inner">
+        <div class="breadcrumb">
+          <a href="/patterns">Patterns</a>
+          <span>/</span>
+          <a href={`/patterns/${categorySlug}`}>{category.category}</a>
+          <span>/</span>
+          <span>{subcategory.name}</span>
+        </div>
+        <h1 class="article-title">{article.title}</h1>
+        {content?.description && <p class="article-desc">{content.description}</p>}
+      </div>
+    </div>
+
+    <div class="article-body">
+      <div class="article-body-inner">
+        <div class="article-content" set:html={content?.html ?? ''} />
+
+        <div class="article-footer">
+          <a href={`/patterns/${categorySlug}`} class="back-link">← Back to {category.category}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .article-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 56px 24px 40px;
+  }
+
+  .article-header-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 20px;
+  }
+
+  .breadcrumb a {
+    color: var(--color-text-tertiary);
+    transition: color 0.15s;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--color-text-primary);
+  }
+
+  .article-title {
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    color: var(--color-text-primary);
+    margin: 0 0 16px;
+  }
+
+  .article-desc {
+    font-size: 16px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0;
+  }
+
+  .article-body {
+    padding: 48px 24px 80px;
+  }
+
+  .article-body-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .article-content {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--color-text-secondary);
+  }
+
+  .article-content :global(h2) {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--color-text-primary);
+    margin: 48px 0 16px;
+  }
+
+  .article-content :global(h3) {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 32px 0 12px;
+  }
+
+  .article-content :global(p) {
+    margin: 0 0 20px;
+  }
+
+  .article-content :global(strong) {
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+
+  .article-content :global(ul), .article-content :global(ol) {
+    padding-left: 20px;
+    margin: 0 0 20px;
+  }
+
+  .article-content :global(li) {
+    margin-bottom: 8px;
+  }
+
+  .article-content :global(hr) {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 40px 0;
+  }
+
+  .article-content :global(blockquote) {
+    border-left: 2px solid var(--color-accent);
+    padding-left: 16px;
+    margin: 24px 0;
+    color: var(--color-text-tertiary);
+    font-style: italic;
+  }
+
+  .article-content :global(code) {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    background-color: var(--color-surface-raised);
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: var(--color-text-primary);
+  }
+
+  .article-footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .back-link {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+    transition: color 0.15s;
+  }
+
+  .back-link:hover {
+    color: var(--color-text-primary);
+  }
+</style>

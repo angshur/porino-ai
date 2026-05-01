@@ -1,0 +1,242 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const stackLayers = [
+  { name: 'Data Infrastructure', tools: 'Kafka, dbt, Iceberg, ClickHouse, Flink, Spark' },
+  { name: 'Cloud Platform', tools: 'AWS, GCP, Azure' },
+  { name: 'Data Platform', tools: 'Snowflake, Databricks, BigQuery' },
+  { name: 'Agentic Systems', tools: 'LangGraph, Claude SDK, CrewAI, AutoGen' },
+];
+
+// Replace these with your Formspree form IDs from formspree.io
+const FIND_FORM_ID = 'YOUR_FIND_FORM_ID';
+const JOIN_FORM_ID = 'YOUR_JOIN_FORM_ID';
+---
+
+<Layout title="Specialist Network" description="Find vetted specialists in data and AI infrastructure, or join the network.">
+  <div class="page">
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="breadcrumb">Porino</div>
+        <h1 class="page-title">Specialist Network</h1>
+        <p class="page-desc">
+          Vetted practitioners organized by stack layer. The Kinesis expert,
+          the dbt specialist, the team with a ClickHouse practice — and the engineers
+          who know how to build multi-agent systems that ship.
+        </p>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="page-body-inner">
+        <div class="two-col">
+          <div class="panel" id="find">
+            <div class="panel-label">Looking for help?</div>
+            <h2 class="panel-title">Find a specialist</h2>
+            <p class="panel-desc">Describe the problem. We'll match you manually with the right person for your stack and use case.</p>
+            <form class="form" action={`https://formspree.io/f/${FIND_FORM_ID}`} method="POST">
+              <textarea name="message" placeholder="What are you trying to build or fix?" class="textarea" rows="4"></textarea>
+              <input type="email" name="email" placeholder="your@email.com" class="input" />
+              <input type="hidden" name="_subject" value="New specialist match request — Porino" />
+              <button type="submit" class="btn-primary">Request a match</button>
+            </form>
+          </div>
+
+          <div class="panel" id="join">
+            <div class="panel-label">Are you a specialist?</div>
+            <h2 class="panel-title">Join the network</h2>
+            <p class="panel-desc">List yourself by stack layer. Early access — we're onboarding specialists now.</p>
+            <form class="form" action={`https://formspree.io/f/${JOIN_FORM_ID}`} method="POST">
+              <input type="text" name="name" placeholder="Your name" class="input" />
+              <input type="email" name="email" placeholder="your@email.com" class="input" />
+              <div class="stack-grid">
+                {stackLayers.map((layer) => (
+                  <label class="stack-option">
+                    <input type="checkbox" name="stack" value={layer.name} class="checkbox" />
+                    <div>
+                      <div class="stack-name">{layer.name}</div>
+                      <div class="stack-tools">{layer.tools}</div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+              <input type="hidden" name="_subject" value="New specialist application — Porino" />
+              <button type="submit" class="btn-primary">Join waitlist</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 56px 24px 40px;
+  }
+
+  .page-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 12px;
+  }
+
+  .page-desc {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0;
+    max-width: 600px;
+  }
+
+  .page-body {
+    padding: 48px 24px 80px;
+  }
+
+  .page-body-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background-color: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .panel {
+    background-color: var(--color-surface);
+    padding: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .panel-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .panel-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0 0 8px;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .input, .textarea {
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 8px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    resize: vertical;
+  }
+
+  .input::placeholder, .textarea::placeholder {
+    color: var(--color-text-tertiary);
+  }
+
+  .input:focus, .textarea:focus {
+    border-color: var(--color-accent);
+  }
+
+  .stack-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 4px 0;
+  }
+
+  .stack-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: border-color 0.15s, background-color 0.15s;
+  }
+
+  .stack-option:hover {
+    border-color: var(--color-text-tertiary);
+    background-color: var(--color-surface-raised);
+  }
+
+  .checkbox {
+    margin-top: 2px;
+    accent-color: var(--color-accent);
+    flex-shrink: 0;
+  }
+
+  .stack-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 2px;
+  }
+
+  .stack-tools {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+  }
+
+  .btn-primary {
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-accent);
+    border: none;
+    border-radius: 5px;
+    padding: 9px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    text-align: center;
+    margin-top: 4px;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+  }
+</style>

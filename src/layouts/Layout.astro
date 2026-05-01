@@ -1,0 +1,137 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Porino',
+  description = 'Patterns, infrastructure, and specialists for data and AI systems.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title === 'Porino' ? 'Porino' : `${title} — Porino`}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles/global.css" />
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="nav-inner">
+        <a href="/" class="nav-logo">Porino</a>
+        <div class="nav-links">
+          <a href="/patterns" class="nav-link">Patterns</a>
+          <a href="/research" class="nav-link">Research</a>
+          <a href="/specialists" class="nav-link">Specialists</a>
+          <a href="/consulting" class="nav-link">Consulting</a>
+        </div>
+        <a href="/specialists#join" class="nav-cta">Join Network</a>
+      </div>
+    </nav>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span class="footer-brand">Porino</span>
+        <span class="footer-copy">Data and AI infrastructure, done right.</span>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid var(--color-border);
+    background-color: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .nav-logo {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .nav-link {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    padding: 6px 10px;
+    border-radius: 5px;
+    transition: color 0.15s, background-color 0.15s;
+  }
+
+  .nav-link:hover {
+    color: var(--color-text-primary);
+    background-color: var(--color-surface-raised);
+  }
+
+  .nav-cta {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    background-color: var(--color-accent);
+    padding: 6px 12px;
+    border-radius: 5px;
+    transition: background-color 0.15s;
+    white-space: nowrap;
+  }
+
+  .nav-cta:hover {
+    background-color: var(--color-accent-hover);
+  }
+
+  .footer {
+    border-top: 1px solid var(--color-border);
+    margin-top: 120px;
+  }
+
+  .footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .footer-brand {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .footer-copy {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+  }
+</style>

@@ -1,0 +1,163 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import { patternsLibrary, getCategoryBySlug } from '../../../data/content.js';
+
+export function getStaticPaths() {
+  return patternsLibrary.map((cat) => ({ params: { category: cat.slug } }));
+}
+
+const { category: categorySlug } = Astro.params;
+const category = getCategoryBySlug(categorySlug);
+---
+
+<Layout title={category.category} description={`Infrastructure patterns: ${category.category}`}>
+  <div class="page">
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="breadcrumb">
+          <a href="/patterns">Patterns</a> / {category.category}
+        </div>
+        <h1 class="page-title">{category.category}</h1>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="page-body-inner">
+        {category.subcategories.map((sub) => (
+          <div class="subcategory-block">
+            <div class="subcategory-header">
+              <span class="subcategory-name">{sub.name}</span>
+              <span class="subcategory-count">{sub.articles.length}</span>
+            </div>
+            <div class="article-list">
+              {sub.articles.map((article) => (
+                <a
+                  href={article.status === 'published' ? `/patterns/${categorySlug}/${sub.slug}/${article.slug}` : '#'}
+                  class={`article-item ${article.status === 'planned' ? 'article-planned' : ''}`}
+                >
+                  <span class="article-title">{article.title}</span>
+                  {article.status === 'planned' && <span class="article-tag">Coming</span>}
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 56px 24px 40px;
+  }
+
+  .page-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 16px;
+  }
+
+  .breadcrumb a {
+    color: var(--color-text-tertiary);
+    transition: color 0.15s;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--color-text-primary);
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0;
+  }
+
+  .page-body {
+    padding: 40px 24px;
+  }
+
+  .page-body-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .subcategory-block {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .subcategory-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .subcategory-name {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  .subcategory-count {
+    font-size: 11px;
+    color: var(--color-text-tertiary);
+    background-color: var(--color-surface-raised);
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .article-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .article-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 10px;
+    border-radius: 4px;
+    transition: background-color 0.15s;
+  }
+
+  .article-item:not(.article-planned):hover {
+    background-color: var(--color-surface-raised);
+  }
+
+  .article-title {
+    font-size: 14px;
+    color: var(--color-text-primary);
+  }
+
+  .article-planned .article-title {
+    color: var(--color-text-tertiary);
+  }
+
+  .article-tag {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--color-text-tertiary);
+    background-color: var(--color-surface-raised);
+    padding: 2px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+</style>

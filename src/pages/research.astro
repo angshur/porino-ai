@@ -1,0 +1,144 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Research & Synthesis" description="Engineering blog breakdowns, new research signals, and papers worth reading.">
+  <div class="page">
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="breadcrumb">Porino</div>
+        <h1 class="page-title">Research & Synthesis</h1>
+        <p class="page-desc">
+          Engineering blog breakdowns, new research signals, and papers worth reading.
+          Filtered for practitioners — not everything published is worth your time.
+        </p>
+      </div>
+    </div>
+    <div class="page-body">
+      <div class="page-body-inner">
+        <div class="coming-soon">
+          <span class="coming-label">Coming soon</span>
+          <p class="coming-desc">The first set of breakdowns is in progress. Subscribe to be notified.</p>
+          <form class="form">
+            <input type="email" placeholder="your@email.com" class="input" />
+            <button type="submit" class="btn">Notify me</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 56px 24px 40px;
+  }
+
+  .page-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 12px;
+  }
+
+  .page-desc {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0;
+    max-width: 560px;
+  }
+
+  .page-body {
+    padding: 80px 24px;
+  }
+
+  .page-body-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .coming-soon {
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background-color: var(--color-surface);
+    padding: 48px;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .coming-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .coming-desc {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  .form {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .input {
+    font-size: 13px;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    padding: 8px 14px;
+    flex: 1;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .input::placeholder {
+    color: var(--color-text-tertiary);
+  }
+
+  .input:focus {
+    border-color: var(--color-accent);
+  }
+
+  .btn {
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-accent);
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    white-space: nowrap;
+  }
+
+  .btn:hover {
+    background-color: var(--color-accent-hover);
+  }
+</style>
