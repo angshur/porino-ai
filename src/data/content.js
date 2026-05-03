@@ -201,7 +201,7 @@ export const patternsLibrary = [
           { title: 'Where Snowflake Wins and Where It Doesn\'t', slug: 'snowflake-wins-and-doesnt', status: 'planned' },
           { title: 'Snowflake vs BigQuery Honest Comparison', slug: 'snowflake-vs-bigquery', status: 'planned' },
           { title: 'Cost Modeling at Different Scales', slug: 'snowflake-cost-modeling', status: 'planned' },
-          { title: 'Snowflake + dbt: The Canonical Stack', slug: 'snowflake-dbt-canonical-stack', status: 'planned' },
+          { title: 'Snowflake + dbt + Cortex AI: The Marketing Measurement Stack', slug: 'snowflake-dbt-canonical-stack', status: 'published' },
         ],
       },
       {

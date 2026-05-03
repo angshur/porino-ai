@@ -69,4 +69,86 @@ export const articles = {
       <p>If you're a consultant or technical lead trying to help a business ship AI: the engagement that ends in production has the data layer conversation first. The engagement that ends in a stalled pilot skips it.</p>
     `,
   },
+  'snowflake-dbt-canonical-stack': {
+    description: 'The canonical stack for marketing measurement data engineering: Snowflake as the warehouse, dbt for transformation, Cortex AI for ML workflows. Architecture patterns, cost traps, and what actually breaks in production.',
+    html: `
+      <p>If you're building a marketing measurement stack in 2025, you're probably going to land on some combination of Snowflake, dbt, and an ML layer. This isn't a vendor recommendation — it's what the evidence points to when you work backwards from what marketing data actually requires.</p>
+      <p>This pattern covers the architecture, the specific choices that matter, and the traps that are easy to fall into.</p>
+
+      <hr />
+
+      <h2>Why Marketing Data Is Uniquely Hard</h2>
+      <p>Marketing data has properties that make it harder to engineer than most enterprise data:</p>
+      <ul>
+        <li><strong>Source fragmentation.</strong> A typical brand pulls data from 10–30 ad platforms, a CRM, an analytics tool, a CDP, an email platform, and a payment processor. Each has a different schema, different latency, different API limits, and different definitions for the same concepts.</li>
+        <li><strong>Definitional inconsistency.</strong> "Conversion" means something different in Google Ads, Meta, Salesforce, and your data warehouse. "Revenue" means something different before and after returns, before and after discounts. Normalizing across these requires explicit, maintained semantic modeling — not just raw ingestion.</li>
+        <li><strong>Time sensitivity that varies by use case.</strong> Campaign pacing decisions need data that's hours old at most. MMM can run on week-old data. Incrementality experiment analysis can wait days. One pipeline does not fit all of these.</li>
+        <li><strong>High-cardinality dimensions.</strong> Ad creative IDs, audience segment IDs, placement IDs — marketing data has enormous dimensional cardinality that creates query performance problems if the data model isn't designed for it.</li>
+      </ul>
+      <p>The stack you choose has to handle all of this without becoming unmaintainable.</p>
+
+      <hr />
+
+      <h2>The Three-Layer Architecture</h2>
+      <p>The architecture that works consistently has three layers:</p>
+      <ul>
+        <li><strong>Ingest</strong> — raw data from all sources, landed as-is into Snowflake staging schemas. No transformation at this layer. High fidelity, append-only, timestamped.</li>
+        <li><strong>Transform</strong> — dbt models that clean, normalize, and semantically model the raw data into clean intermediate and mart layers. This is where "conversion" gets a single definition, where spend is normalized to a common currency and attribution window, where customer identity gets resolved.</li>
+        <li><strong>Serve</strong> — marts and feature tables that are purpose-built for downstream consumers: BI tools, MMM pipelines, ML feature stores, activation APIs.</li>
+      </ul>
+      <p>The critical discipline: transformation happens only in the transform layer. Raw data stays raw. Serve layer tables are built from transform layer models, never directly from staging. This separation is what makes the system debuggable when something breaks.</p>
+
+      <hr />
+
+      <h2>Snowflake as the Hub</h2>
+      <p>Snowflake works well as the hub for marketing data for specific reasons:</p>
+      <p><strong>Zero-copy data sharing.</strong> For clean room use cases — sharing data with a publisher or a partner without exposing raw records — Snowflake's secure data sharing is a native capability. You don't need a separate clean room vendor if your counterparty is also on Snowflake.</p>
+      <p><strong>Separation of compute and storage.</strong> Marketing data ingestion is bursty. End-of-month reporting runs are heavy. Cortex AI inference jobs are episodic. Snowflake's compute/storage separation means you can size compute to the workload, not to the peak, which matters for cost.</p>
+      <p><strong>Semi-structured data handling.</strong> Ad platform APIs return JSON. Snowflake's VARIANT type and FLATTEN function handle this natively without a preprocessing step. For teams ingesting from 20+ platforms, this removes a class of brittle ETL.</p>
+      <p>Where Snowflake creates problems:</p>
+      <p><strong>Cost at high query concurrency.</strong> If you're serving user-facing analytics — dashboards refreshing for hundreds of users simultaneously — Snowflake's credit model gets expensive fast. For internal BI and analytical workloads, it's fine. For embedded analytics, you likely want a purpose-built OLAP layer in front of it.</p>
+      <p><strong>Streaming ingestion.</strong> Snowflake is not a streaming database. If you need sub-minute freshness for any part of your marketing stack (real-time bidding signals, live pacing), you need a streaming layer upstream — Kafka, Kinesis, or Pub/Sub — landing into Snowpipe or a dedicated real-time store. Don't try to make Snowflake real-time.</p>
+
+      <hr />
+
+      <h2>dbt for Marketing Data Models</h2>
+      <p>dbt is the right transformation layer for marketing data because marketing data models are logic-heavy, not compute-heavy. The transformation work is mostly normalization, joining, and aggregation — SQL workloads that benefit more from good model design than from Spark-scale compute.</p>
+      <p>Specific patterns that matter for marketing data:</p>
+      <p><strong>Spend normalization as a base model.</strong> Build a single <code>fct_spend</code> model that unions all ad platform spend, normalizes to a common schema (date, channel, campaign, ad group, creative, spend, impressions, clicks), and applies a consistent attribution window definition. Everything downstream joins to this. When a new platform gets added, you add one source model and the base model absorbs it.</p>
+      <p><strong>Identity resolution as a separate model layer.</strong> Customer identity stitching — connecting email addresses, phone numbers, CRM IDs, and anonymous web IDs into unified customer records — is its own modeling problem. Build it as a dedicated model layer with clear inputs and outputs. Don't bake it into your conversion attribution models, or you'll never be able to debug either.</p>
+      <p><strong>Slowly changing dimensions for campaign metadata.</strong> Campaign names, audience targeting parameters, creative copy — these change over time and you need history. Model them as SCDs so you can attribute performance to the right configuration at the time the spend ran.</p>
+      <p><strong>Data contracts via tests.</strong> Every mart model that feeds downstream ML or reporting should have dbt tests enforcing: no nulls on key columns, referential integrity on join keys, row count within expected range, spend non-negative. Marketing data from ad platforms is surprisingly dirty. Catch it at the model layer, not downstream in an MMM that produces nonsensical outputs.</p>
+
+      <hr />
+
+      <h2>Cortex AI for ML Workflows</h2>
+      <p>Snowflake Cortex AI brings ML inference inside the warehouse, which removes a class of data movement problems. For marketing data specifically, the use cases where it earns its place:</p>
+      <p><strong>Audience quality scoring.</strong> Running a propensity or lookalike model against your customer base to score likelihood-to-convert, likelihood-to-churn, or predicted LTV. With Cortex, this runs as a SQL function against data that's already in Snowflake — no ETL to a separate ML platform, no training-serving skew from moving data between environments.</p>
+      <p><strong>Creative performance classification.</strong> Using Cortex's multimodal capabilities to classify ad creative by visual attributes, copy tone, and format — then joining that to performance data to understand which creative attributes correlate with outcomes. This is a workflow that previously required a custom pipeline and a separate vision model.</p>
+      <p><strong>Anomaly detection on spend and performance.</strong> Running statistical anomaly detection on daily spend and KPI data to surface significant deviations before they compound. Useful for catching trafficking errors, budget pacing issues, and performance drops early.</p>
+      <p>Where Cortex is not the right tool: complex MMM modeling, geo experiment analysis, or any ML workflow that requires custom training on proprietary architectures. For those, you want a Python environment — a Snowpark notebook, a Hex workspace, or a dedicated ML platform — that can access Snowflake data but isn't constrained by Cortex's model options.</p>
+
+      <hr />
+
+      <h2>The Traps</h2>
+      <p><strong>Ingesting everything before modeling anything.</strong> The temptation is to land all sources in Snowflake first, then figure out the data models. This produces a warehouse full of raw data and no analytical layer. The transformation work takes longer than the ingestion work. Prioritize the models for the use cases that have immediate value — spend normalization, conversion attribution, channel performance reporting — and build ingest for those sources first.</p>
+      <p><strong>Using Snowflake credits for development workloads.</strong> Development queries run against full datasets are expensive. Use cloning and zero-copy branching to create dev environments against production data without paying full scan costs. Set warehouse auto-suspend to 60 seconds. Tag workloads with query tags so you can see where credits are going.</p>
+      <p><strong>Skipping the semantic layer.</strong> dbt transforms raw data into clean tables. But "clean tables" and "agreed business definitions" are not the same thing. If your BI tool or your data scientists are writing their own metric calculations in queries, you'll have definition drift within 6 months. Build a semantic layer — dbt Metrics, Looker LookML, or a dedicated tool like Cube — that enforces single definitions for revenue, ROAS, CPA, and conversion across all consumers.</p>
+      <p><strong>Cortex costs without governance.</strong> Cortex AI inference is billed per token or per function call depending on the model. Marketing data at scale — scoring millions of customer records, classifying tens of thousands of creatives — can generate significant Cortex spend if it's not governed. Set up resource monitors and query budgets before running any Cortex workload at scale.</p>
+
+      <hr />
+
+      <h2>What the Full Stack Looks Like</h2>
+      <p>The working version of this stack for a mid-market brand looks like:</p>
+      <ul>
+        <li>Fivetran or Airbyte landing raw data from ad platforms, CRM, and analytics into Snowflake staging schemas</li>
+        <li>dbt Cloud running transformation on a daily schedule, with tests enforcing data quality at each layer</li>
+        <li>A semantic layer (dbt Metrics or equivalent) exposing agreed definitions to BI tools and downstream consumers</li>
+        <li>Cortex AI functions for scoring and classification workloads that can tolerate batch latency</li>
+        <li>A Python environment (Snowpark or external) for MMM modeling and incrementality analysis, reading from mart tables</li>
+        <li>Snowflake secure data sharing for clean room use cases with publisher partners</li>
+      </ul>
+      <p>The thing that makes this stack work is not the tools — it's the modeling discipline. The tools are commodity. The decision to build a single <code>fct_spend</code> model that everything joins to, the decision to enforce data contracts at the mart layer, the decision to separate identity resolution from attribution logic — those are the decisions that determine whether the stack is still maintainable in two years.</p>
+    `,
+  },
 };
