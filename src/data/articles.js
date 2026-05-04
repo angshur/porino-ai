@@ -69,6 +69,201 @@ export const articles = {
       <p>If you're a consultant or technical lead trying to help a business ship AI: the engagement that ends in production has the data layer conversation first. The engagement that ends in a stalled pilot skips it.</p>
     `,
   },
+  'clean-room-measurement-architecture': {
+    description: 'A data clean room is not just a privacy feature. It is an architectural pattern for controlled collaboration between brands, publishers, agencies, and retail media partners. Here is how to build one that actually works.',
+    html: `
+      <p>Advertising measurement increasingly depends on collaboration between organizations that cannot freely share raw data. A brand owns first-party customer and commerce data. A publisher owns exposure and audience data. A retail media network owns shopper behavior and transaction data. An agency manages planning, buying, and reporting.</p>
+      <p>The business need is clear: advertisers want to understand whether media exposure influenced business outcomes. The governance challenge is equally clear: raw customer-level data should not move freely across parties. Clean room architecture is the solution — not just as a privacy feature, but as an architectural pattern for controlled collaboration.</p>
+
+      <hr />
+
+      <h2>Core Principles</h2>
+      <p>A strong clean room architecture follows five principles regardless of vendor or implementation:</p>
+      <ul>
+        <li><strong>Purpose-specific collaboration.</strong> Define what the collaboration is for before building it: reach analysis, overlap analysis, conversion lift, audience quality, incrementality, or campaign reporting. Purpose determines what data is needed and what outputs are permitted.</li>
+        <li><strong>Minimized raw data access.</strong> The system supports matching, aggregation, and approved queries without exposing unrestricted record-level data.</li>
+        <li><strong>Governance built into the workflow.</strong> Permissions, templates, thresholds, approvals, and audit logs are part of the architecture — not bolted on after the fact.</li>
+        <li><strong>Business-ready outputs.</strong> A clean room that only produces technical tables is incomplete. The goal is decisions, not data.</li>
+        <li><strong>Repeatability.</strong> A brand should not rebuild a new measurement process for every partner and every campaign.</li>
+      </ul>
+
+      <hr />
+
+      <h2>The Eight Components</h2>
+
+      <h3>1. Participant Data Domains</h3>
+      <p>Each participant maintains their own data domain and brings specific inputs to the collaboration.</p>
+      <p>A brand contributes customer records, CRM or loyalty IDs, hashed email or phone identifiers where permitted, online and offline transactions, product categories, revenue and margin, customer segments, and consent metadata.</p>
+      <p>A publisher or media partner contributes exposure logs, campaign IDs, creative IDs, placement metadata, audience segment membership, frequency and reach signals, and publisher-specific user IDs.</p>
+      <p>An agency contributes campaign plan metadata, media spend, budget allocations, channel taxonomy, and optimization rules.</p>
+      <p>Identity or measurement partners contribute identity resolution keys, match tables, household graphs, and measurement methodologies.</p>
+      <p>The architecture allows each participant to collaborate without giving up ownership of their data domain.</p>
+
+      <h3>2. Identity and Match Layer</h3>
+      <p>The match layer determines which records can be connected across parties. Common match keys: hashed email, hashed phone, household ID, platform ID, publisher ID, identity provider ID, and clean room-specific collaboration IDs.</p>
+      <p>The match process must respect consent and purpose limitations. A customer who consented to measurement may not have consented to activation. The match layer should also track match quality metrics — match rate by partner, geography, segment, device type, and campaign. Low match rates bias measurement outputs and must be disclosed.</p>
+
+      <h3>3. Consent and Policy Layer</h3>
+      <p>This layer defines: which data sources are eligible for collaboration, which users can initiate analysis, which fields can be used for matching versus segmentation, which outputs can leave the clean room, what aggregation threshold is required, what geography or regulation applies, and whether results can be used for activation, measurement, or reporting only.</p>
+      <p>This is what separates clean room architecture from a normal shared database. The policy layer is where GDPR, CCPA, and partner contractual obligations get enforced in the data architecture rather than in legal documents.</p>
+
+      <h3>4. Approved Query and Template Layer</h3>
+      <p>Business users should not write arbitrary queries against partner data. The clean room provides approved templates: audience overlap analysis, exposed versus non-exposed conversion comparison, reach and frequency analysis, segment-level performance, incremental lift analysis, retail media closed-loop measurement, and frequency saturation analysis.</p>
+      <p>Templates reduce governance risk, improve repeatability, and make clean rooms usable for agencies and marketing teams without deep SQL expertise.</p>
+
+      <h3>5. Measurement Methodology Layer</h3>
+      <p>Clean room outputs connect to specific measurement methods. For basic reporting: descriptive aggregation of exposed customers, conversions, revenue, and conversion rate. For lift measurement: exposed versus control group comparison controlling for geography, time, segment, or prior purchase behavior. For incrementality: holdouts, geo experiments, difference-in-differences, synthetic controls, or matched-market testing. For reach and frequency: deduplicated reach across publishers and placements.</p>
+      <p>The method must be explicit in every output. Business users need to know whether a result is descriptive, attributed, modeled, experimental, or causal.</p>
+
+      <h3>6. Output Governance Layer</h3>
+      <p>Controls what results are returned: minimum aggregation thresholds, suppression of small cells, noise injection where appropriate, export restrictions, partner approval workflows, result expiration, and audit logging. The clean room should not simply ask whether an analysis can run — it should ask whether the output is safe to reveal.</p>
+
+      <h3>7. Business Application Layer</h3>
+      <p>The clean room becomes valuable when outputs reach decision-makers: campaign measurement dashboards, agency-facing performance summaries, publisher proof-of-performance reports, retail media closed-loop measurement applications, budget planning tools, executive narratives, and AI-assisted measurement explanations. A CMO or media leader should not need to interpret raw clean room tables.</p>
+
+      <h3>8. Audit and Observability Layer</h3>
+      <p>The system tracks: which partner initiated the collaboration, which datasets were used, which template or query ran, which fields were accessed, which outputs were generated, who viewed or exported results, which privacy thresholds were applied, and which business decision used the output. This is especially important when AI agents are introduced — recommendations based on clean room outputs must be traceable back to approved inputs and approved methods.</p>
+
+      <hr />
+
+      <h2>The Five Failure Modes</h2>
+      <p><strong>Weak identity strategy.</strong> If match keys are poor or consent is unclear, outputs will be incomplete or unusable. Check your match rate before running any analysis.</p>
+      <p><strong>Over-technical design.</strong> If only data scientists can use the clean room, adoption will be limited. Business users need approved templates, not raw SQL access.</p>
+      <p><strong>Unclear business purpose.</strong> A clean room should be tied to specific use cases. "We have a clean room" is not a measurement strategy.</p>
+      <p><strong>Lack of repeatability.</strong> If every campaign requires custom data engineering, the clean room will not scale. Build templates and reuse them.</p>
+      <p><strong>Weak output governance.</strong> Privacy risk often appears in the result that is exported, not in the data that goes in. The output layer is where governance matters most.</p>
+    `,
+  },
+  'mmm-budget-optimization-architecture': {
+    description: 'MMM is not just a statistical model. In an enterprise environment it is a data product — requiring governed inputs, repeatable feature engineering, model management, scenario planning, and executive-ready explanation.',
+    html: `
+      <p>Media Mix Modeling is resurging because marketers need measurement that works in a privacy-constrained environment. As user-level tracking becomes less complete, MMM's ability to estimate channel contribution from aggregated data makes it newly valuable.</p>
+      <p>But MMM is often misunderstood. It is not just a statistical model. In an enterprise environment, MMM is a data product. It requires reliable inputs, governed definitions, repeatable feature engineering, model management, scenario planning, and executive-ready explanation. A strong MMM architecture connects marketing science to business decisioning — and most implementations break somewhere in that chain.</p>
+
+      <hr />
+
+      <h2>Start With the Business Questions</h2>
+      <p>Before building the model, define the decisions it needs to support. Common questions:</p>
+      <ul>
+        <li>What is the contribution of each media channel to sales, revenue, or pipeline?</li>
+        <li>What is the marginal return of additional spend by channel?</li>
+        <li>Which channels are saturated?</li>
+        <li>How should next quarter's budget be allocated?</li>
+        <li>What happens if total spend increases or decreases by 10%?</li>
+        <li>Which regions or segments respond differently to media investment?</li>
+        <li>Which channels drive short-term response versus long-term brand impact?</li>
+      </ul>
+      <p>Without clear decision questions, MMM becomes an academic exercise. With clear questions, it becomes a planning system.</p>
+
+      <hr />
+
+      <h2>The Nine-Layer Architecture</h2>
+
+      <h3>1. Data Source Layer</h3>
+      <p>MMM requires aggregated historical data. Core inputs: media spend by channel, campaign, region, and time period; impressions, clicks, reach, and frequency; promotions, discounts, and pricing changes; product availability; web traffic and conversion events; store sales or commerce revenue; CRM pipeline; customer acquisition and retention metrics; macro-economic variables; seasonality and holiday indicators.</p>
+      <p>Collect at a consistent grain. Weekly data is common, but the right grain depends on business cycle, spend volume, campaign cadence, and outcome latency. A brand with fast-moving consumer goods and weekly promotions needs weekly data. A B2B company with 90-day sales cycles may need monthly.</p>
+
+      <h3>2. Data Quality and Validation Layer</h3>
+      <p>MMM is only as strong as its input data. Validate before model training: missing spend or outcome periods, duplicate campaign records, currency mismatches, taxonomy inconsistencies, sudden metric spikes or drops, changes in tracking methodology, channel renames, region mapping issues, outlier promotions or extraordinary events.</p>
+      <p>A model should not quietly absorb bad data. Failed validations should block the pipeline and surface for investigation — not silently propagate into outputs that get presented to executives.</p>
+
+      <h3>3. Taxonomy and Semantic Layer</h3>
+      <p>MMM requires stable definitions: channel hierarchy, campaign objective, product line, region or market, customer segment, revenue type, conversion type, spend type, and outcome KPI. If "paid social" includes different platforms or campaign types over time, channel-level outputs become misleading. The semantic layer is what makes model outputs interpretable and auditable.</p>
+
+      <h3>4. Feature Engineering Layer</h3>
+      <p>MMM requires transformations that represent how media affects outcomes over time. Common features: lag variables, adstock transformations, saturation curves, seasonality indicators, holiday flags, promotion flags, price index variables, macro-economic indicators, competitor activity proxies, and baseline demand features. This layer should be versioned. If a model is retrained, the organization should know exactly how features were created and whether the feature logic changed.</p>
+
+      <h3>5. Model Development Layer</h3>
+      <p>MMM can be built using regression-based models, Bayesian MMM, hierarchical models, time-series models, regularized regression, or causal models with experimental calibration. Data scientists work in Python against governed Snowflake data — Snowpark, notebooks, or external Python environments. The model must produce interpretable outputs: channel contribution, baseline sales, incremental impact, ROAS, marginal return, saturation points, confidence intervals, response curves, and scenario forecasts.</p>
+
+      <h3>6. Experiment Calibration Layer</h3>
+      <p>MMM should not operate in isolation. Incrementality experiments calibrate and validate model assumptions. Calibration inputs: geo experiments, market holdouts, audience holdouts, difference-in-differences studies, synthetic control analyses, and platform conversion lift studies. MMM is strategic; experiments are the truth anchor. Where experimental evidence exists, incorporate it. Where it doesn't, flag the uncertainty in the model outputs.</p>
+
+      <h3>7. Budget Optimization Layer</h3>
+      <p>Budget optimization translates response curves into investment recommendations. A good optimizer accounts for: total budget, minimum and maximum spend by channel, existing commitments, channel saturation, inventory constraints, regional priorities, business goals, risk tolerance, confidence levels, and brand versus performance objectives.</p>
+      <p>The optimizer should support scenario planning, not just produce one answer. What if budget increases by 15%? What if paid search is capped? What if retail media must receive at least 20% of spend? What if the goal shifts from revenue to new customer acquisition? These scenarios make the architecture useful to CMOs, finance leaders, agencies, and media planners — not just data scientists.</p>
+
+      <h3>8. User-Facing Analytics Layer</h3>
+      <p>MMM outputs must reach business users: executive summary, channel contribution dashboard, response curve explorer, scenario planner, budget recommendation tool, confidence and assumption explanation, region and segment comparison, experiment calibration view, and model limitation notes. The user should not need to read a Python notebook to understand the budget implications.</p>
+
+      <h3>9. AI Agent Layer</h3>
+      <p>A governed AI agent makes MMM more accessible. The agent answers: why is the model recommending more spend in retail media, which channels are saturated, what changed since the last model run, how confident are we in the recommendation, what happens if we reduce upper-funnel spend, which assumptions should be validated with an experiment. The agent retrieves approved model outputs, explains assumptions, cites data sources, and avoids unsupported causal claims. It operates with role-based permissions and maintains an audit trail.</p>
+
+      <hr />
+
+      <h2>The Five Failure Modes</h2>
+      <p><strong>Treating MMM as a vendor report rather than an owned capability.</strong> If the brand cannot understand the data, assumptions, or outputs, the model will not drive confident decisions. Own the model or understand it deeply enough to interrogate it.</p>
+      <p><strong>Weak taxonomy.</strong> Inconsistent channel and objective definitions make channel contribution estimates untrustworthy. Fix this before running the model.</p>
+      <p><strong>Ignoring experiments.</strong> MMM needs causal calibration. A model that has never been validated against holdout results is a model you're taking on faith.</p>
+      <p><strong>Optimizing without constraints.</strong> A purely mathematical budget allocation may be operationally impossible. The optimizer needs to know about contracts, minimum spends, and business rules.</p>
+      <p><strong>Poor storytelling.</strong> Executives need to understand not only what the model says, but why it matters, what assumptions drive it, and how much confidence to place in it. A recommendation without uncertainty bounds is a recommendation that will be over-trusted.</p>
+    `,
+  },
+  'ai-agent-media-planning': {
+    description: 'An AI agent for media planning and measurement cannot be treated like a generic chatbot. Advertising data is fragmented, governed, privacy-sensitive, and methodologically complex. A useful marketing agent is defined by architecture, not just model intelligence.',
+    html: `
+      <p>AI agents are becoming serious infrastructure in enterprise marketing and advertising. The promise is real: a marketer asks a question, the agent analyzes performance, retrieves campaign context, runs models, explains tradeoffs, and recommends the next best action.</p>
+      <p>But a media planning and measurement agent is not a generic chatbot. Advertising data is fragmented, governed, privacy-sensitive, and methodologically complex. The agent must understand campaign taxonomy, media objectives, measurement limitations, identity constraints, consent rules, model outputs, and business goals. A useful marketing agent is defined by architecture, not just model intelligence.</p>
+
+      <hr />
+
+      <h2>The Right Mental Model</h2>
+      <p>The common mistake is imagining the agent as a free-form reasoning system with broad access to everything. That is dangerous in advertising and media, where data governance, privacy rules, and methodological precision matter.</p>
+      <p>The better architecture treats the agent as an orchestration layer over governed data products and approved tools. The agent retrieves approved metrics, calls approved analytical functions, respects role-based and purpose-based permissions, explains outputs in business language, identifies assumptions and limitations, asks for human approval before triggering high-impact actions, and maintains an audit trail.</p>
+      <p>The agent does not invent metric definitions, join sensitive data without permission, expose user-level data to unauthorized users, treat modeled conversions as observed facts, make unsupported causal claims, or automatically reallocate large budgets without approval. This distinction is critical.</p>
+
+      <hr />
+
+      <h2>The Ten Components</h2>
+
+      <h3>1. Governed Data Foundation</h3>
+      <p>Campaign performance data, media spend, impressions, clicks, reach and frequency, conversion events, CRM and pipeline data, commerce and sales outcomes, campaign metadata, audience segments, clean room outputs, MMM outputs, incrementality results, and consent and identity metadata. The agent interacts with modeled and semantic layers — not uncontrolled raw tables.</p>
+
+      <h3>2. Semantic Layer</h3>
+      <p>The semantic layer defines the business meaning of metrics: what is spend, what is revenue, what is conversion, what is incremental conversion, what is ROAS, what is CPA, which attribution window is used, which conversion source is authoritative, which fields are approved for executive reporting. Without a semantic layer, the agent produces inconsistent answers. In marketing, metric definitions are often political as well as technical — the semantic layer makes them explicit and enforced.</p>
+
+      <h3>3. Permission and Policy Layer</h3>
+      <p>The agent must know who is asking and what they are allowed to see. The policy layer accounts for user role, customer or account scope, data source permissions, partner restrictions, clean room output rules, consent limitations, export rules, purpose of use, and geography and regulation. The same question may require different answers depending on the user — an internal analyst versus a client-facing account manager versus a partner sees different data.</p>
+
+      <h3>4. Tool Registry</h3>
+      <p>The agent has access to approved tools with clear inputs, outputs, permissions, and limitations. Examples: metric retrieval tool, campaign comparison tool, budget pacing tool, MMM scenario planner, incrementality result lookup, clean room measurement summary, audience overlap tool, reach and frequency analysis, forecasting tool, executive narrative generator, data quality check tool. Tool calls are logged.</p>
+
+      <h3>5. Analytical Methods Layer</h3>
+      <p>The agent calls approved analytical methods — it does not improvise measurement logic. Methods: descriptive reporting, attribution summary, MMM contribution analysis, scenario planning, budget optimization, incrementality test interpretation, forecasting, anomaly detection, audience quality scoring. This ensures methodological consistency across all agent responses. If every response uses different logic, trust breaks down.</p>
+
+      <h3>6. Context Layer</h3>
+      <p>The agent needs business context beyond numbers: campaign objectives, brand goals, budget constraints, regional priorities, seasonality, promotional calendar, product launches, agency notes, executive preferences, prior recommendations, known data caveats. Without context, analysis is shallow. A campaign may look inefficient by short-term CPA but be intentionally designed for brand awareness — the agent needs to know that before recommending anything.</p>
+
+      <h3>7. Reasoning and Planning Layer</h3>
+      <p>The agent decomposes user questions into steps. For "Should we increase spend on retail media next month?" the agent: identifies the relevant campaign, channel, and time period; retrieves spend and outcome trends; checks MMM response curve outputs; checks recent incrementality or clean room results; examines saturation and budget constraints; compares against business goals; generates a recommendation with confidence and caveats; suggests a follow-up experiment if evidence is weak. The planning layer is constrained by available tools and permissions.</p>
+
+      <h3>8. Human-in-the-Loop Control</h3>
+      <p>Media decisions can have significant budget impact. Define when human approval is required: low-risk explanation (no approval), draft recommendation (no approval), exporting a client-facing report (may require approval), triggering campaign changes (approval required), reallocating budget (approval required), sharing partner data externally (approval required). Human-in-the-loop design does not weaken the agent — it makes it enterprise-safe.</p>
+
+      <h3>9. Evaluation and Observability Layer</h3>
+      <p>The agent is evaluated continuously: answer accuracy, correct metric usage, permission compliance, tool call correctness, data source traceability, causal claim discipline, recommendation quality, user satisfaction, business impact, hallucination detection. Observability tracks: user question, data accessed, tools called, intermediate outputs, final answer, user feedback, and follow-up action.</p>
+
+      <h3>10. User Experience Layer</h3>
+      <p>The agent experience matches the user persona. A CMO needs executive summaries, risks, and strategic recommendations. A media planner needs scenario planning, budget pacing, and channel tradeoffs. A marketing scientist needs model assumptions, diagnostics, and confidence intervals. An agency account manager needs client-ready narratives. A data architect needs lineage, data quality, and governance views. The same architecture supports multiple experiences when the semantic, policy, and tool layers are designed correctly.</p>
+
+      <hr />
+
+      <h2>Example: Budget Reallocation</h2>
+      <p>User question: "Should we shift more spend into connected TV next month?"</p>
+      <p>Agent workflow: identify current spend, campaign objective, geography, and time period → retrieve CTV spend, reach, frequency, and outcome data → compare CTV against other channels → check MMM response curves for marginal return → check clean room or publisher lift results if available → check saturation and frequency levels → check budget constraints and business goals → generate recommendation with confidence level and caveats → suggest experiment if evidence is incomplete.</p>
+      <p>Example response: "CTV appears underfunded relative to its modeled contribution, but the recommendation has medium confidence because recent lift evidence is limited. A 5–8% budget increase may be reasonable if the goal is incremental reach, but I would pair it with a geo holdout or publisher clean room analysis before making a larger shift."</p>
+      <p>That is the kind of answer a governed media agent should produce: useful, cautious, and decision-oriented.</p>
+
+      <hr />
+
+      <h2>The Five Failure Modes</h2>
+      <p><strong>Weak data grounding.</strong> The agent gives fluent answers that cannot be traced to governed metrics. Sounds good, can't be verified, shouldn't be trusted.</p>
+      <p><strong>Permission blindness.</strong> The agent combines or exposes data the user shouldn't see. Usually discovered in an incident, not during development.</p>
+      <p><strong>Metric confusion.</strong> The agent mixes platform conversions, modeled conversions, and business outcomes without caveats. One of the most common and most damaging failure modes in marketing AI.</p>
+      <p><strong>Unsupported causality.</strong> The agent says a channel "drove" revenue when the evidence is only correlational. This is the difference between a trustworthy advisor and a confident-sounding tool that leads to bad decisions.</p>
+      <p><strong>Poor user experience.</strong> The agent answers questions but doesn't help the user decide what to do next. Analysis without recommendation is just reporting.</p>
+    `,
+  },
   'agent-data-access': {
     description: 'The dominant question in AI agent design is what the agent can do. In enterprise marketing and advertising, the more important question is what data the agent is actually allowed to see.',
     html: `

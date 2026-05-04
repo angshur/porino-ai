@@ -57,6 +57,7 @@ export const patternsLibrary = [
         name: 'Case Studies',
         slug: 'case-studies',
         articles: [
+          { title: 'AI Agent for Media Planning and Measurement', slug: 'ai-agent-media-planning', status: 'published' },
           { title: 'SDR Personalization at Scale', slug: 'case-study-sdr-personalization', status: 'planned' },
           { title: 'Contract Review Across 500 Agreements', slug: 'case-study-contract-review', status: 'planned' },
           { title: 'L1 Ticket Triage Without Hiring', slug: 'case-study-ticket-triage', status: 'planned' },
@@ -126,6 +127,7 @@ export const patternsLibrary = [
         name: 'Patterns',
         slug: 'patterns',
         articles: [
+          { title: 'MMM and Budget Optimization: A Reference Architecture', slug: 'mmm-budget-optimization-architecture', status: 'published' },
           { title: 'The Feature Store Problem', slug: 'feature-store-problem', status: 'planned' },
           { title: 'Training-Serving Skew: The Silent Killer', slug: 'training-serving-skew', status: 'planned' },
         ],
@@ -202,6 +204,7 @@ export const patternsLibrary = [
           { title: 'Snowflake vs BigQuery Honest Comparison', slug: 'snowflake-vs-bigquery', status: 'planned' },
           { title: 'Cost Modeling at Different Scales', slug: 'snowflake-cost-modeling', status: 'planned' },
           { title: 'Snowflake + dbt + Cortex AI: The Marketing Measurement Stack', slug: 'snowflake-dbt-canonical-stack', status: 'published' },
+          { title: 'Privacy-Safe Clean Room Measurement Architecture', slug: 'clean-room-measurement-architecture', status: 'published' },
         ],
       },
       {
