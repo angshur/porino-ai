@@ -535,4 +535,266 @@ export const articles = {
       <p>The thing that makes this stack work is not the tools — it's the modeling discipline. The tools are commodity. The decision to build a single <code>fct_spend</code> model that everything joins to, the decision to enforce data contracts at the mart layer, the decision to separate identity resolution from attribution logic — those are the decisions that determine whether the stack is still maintainable in two years.</p>
     `,
   },
+
+  'when-more-agents-makes-things-worse': {
+    description: 'A study of 180 agent configurations found that blindly adding agents degrades performance by up to 70%. Here are the three failure modes and what to do about them.',
+    html: `
+      <p>The assumption is intuitive: more agents, more parallelism, better results. You split the work, you scale the reasoning, you ship faster.</p>
+      <p>A recent study across 180 agent configurations — spanning GPT, Gemini, and Claude model families — tested that assumption directly. The finding was uncomfortable: blindly adding agents can degrade performance by up to 70%.</p>
+      <p>This is not a model quality problem. It is an architecture problem.</p>
+
+      <hr />
+
+      <h2>Three Failure Modes That Explain Why</h2>
+
+      <h3>1. Coordination Tax</h3>
+      <p>When a task requires many tools or subcomponents, extra agents spend more tokens communicating than reasoning. Each handoff carries context. Each agent restates the problem for the next. Each message is a token cost that produces no output.</p>
+      <p>At low agent counts, coordination is cheap relative to the work. At high agent counts, the overhead eats the benefit. You end up with a system that is simultaneously expensive and slower than a single well-prompted agent would have been.</p>
+      <p>The signal to watch: if your agents are spending most of their turns summarizing prior outputs for the next agent, you have a coordination tax problem. The fix is usually fewer agents with broader scope, not tighter coordination protocols.</p>
+
+      <h3>2. Capability Saturation</h3>
+      <p>If a single agent already solves a task at roughly 45% accuracy, adding more agents gives diminishing — or negative — returns.</p>
+      <p>Why? Because the bottleneck at that point is not throughput. It is the quality of the reasoning step itself. More agents running the same flawed reasoning in parallel doesn't improve accuracy — it amplifies variance. You get more answers, none of them more correct, and now you have a voting problem on top of a quality problem.</p>
+      <p>Multi-agent architectures pay off when tasks are genuinely parallelizable and independent — different documents, different customers, different data partitions. They do not pay off when the core reasoning step is the bottleneck and you're trying to brute-force past it with concurrency.</p>
+
+      <h3>3. Error Amplification</h3>
+      <p>In peer setups where agents pass outputs to each other without verification, one agent's wrong output becomes a false premise for the next. The error doesn't just persist — it compounds. Each subsequent agent reasons confidently on top of a flawed foundation.</p>
+      <p>This is the most dangerous failure mode because it is invisible. The system produces outputs. The agents complete their tasks. The final answer arrives with the same formatting and confidence as a correct one. The error is buried in step three of eight.</p>
+      <p>Centralized manager architectures contain this better. A manager agent that reviews and validates outputs before passing them forward can catch errors before they propagate. The cost is latency. The benefit is reliability. For high-stakes workflows, that tradeoff is usually worth it.</p>
+
+      <hr />
+
+      <h2>What This Means for How You Build</h2>
+      <p>Before adding another agent to your system, ask three questions:</p>
+      <ul>
+        <li><strong>Is the task actually parallelizable?</strong> If each step depends on the previous output, agents running in parallel can't help. You need a better single-agent loop, not more agents.</li>
+        <li><strong>Where is the bottleneck?</strong> If accuracy on the core reasoning step is below 60%, adding agents is the wrong fix. Improve the prompt, the retrieval, the tool definitions, or the model. More agents on a broken foundation is faster failure.</li>
+        <li><strong>Who verifies the handoffs?</strong> If agents are passing outputs to each other without a validation step, you are building error amplification in by design. Decide where in the chain you need a checking layer — and build it explicitly, not as an afterthought.</li>
+      </ul>
+      <p>The most reliable multi-agent systems I have seen are not the most complex. They are the most deliberate. Fewer agents, clearer boundaries, explicit validation, and a clear answer to the question: what happens when one agent is wrong?</p>
+
+      <hr />
+
+      <h2>The Advertising and Media Context</h2>
+      <p>In campaign reporting or media measurement pipelines, error amplification is especially dangerous. A misclassified conversion event from one agent becomes a false premise for the budget optimization agent downstream. The budget agent allocates spend based on inflated ROAS for a channel that didn't actually earn it. The reporting agent summarizes the allocation as a success. By the time a human looks at the numbers, three steps of compounded error are baked into the output.</p>
+      <p>The fix is architectural: validate conversion classification before it enters the optimization layer. Don't assume agent outputs are clean just because they arrived.</p>
+    `,
+  },
+
+  'prompt-vs-context-engineering': {
+    description: 'Prompt engineering is about writing better instructions. Context engineering is about giving the model the right operating environment. For agents, the difference matters.',
+    html: `
+      <p>For simple tasks, a good prompt is often enough. You write clear instructions. The model follows them. You ship.</p>
+      <p>For agents, the prompt is only one part of the system — and often not the most important part.</p>
+
+      <hr />
+
+      <h2>What Prompt Engineering Actually Is</h2>
+      <p>Prompt engineering is the practice of writing better instructions. You learn what kinds of phrasing produce more reliable outputs. You add examples. You structure your request. You iterate on wording until the model does what you want.</p>
+      <p>It works. For a lot of use cases, it is the right tool. A well-written prompt gets you 80% of the way there on most single-turn tasks.</p>
+      <p>But it has a ceiling — especially in production systems where the model is not just answering one question but running a multi-step process, calling tools, reading outputs, and making decisions over time.</p>
+
+      <hr />
+
+      <h2>What Context Engineering Is</h2>
+      <p>Context engineering is the practice of designing the full operating environment for a model. Not just the instructions — everything the model can see when it reasons.</p>
+      <p>That includes:</p>
+      <ul>
+        <li><strong>Instructions</strong> — what the agent is supposed to do</li>
+        <li><strong>Relevant knowledge</strong> — background, domain facts, business rules</li>
+        <li><strong>Memory</strong> — what happened in prior turns or prior sessions</li>
+        <li><strong>Retrieved documents</strong> — files, records, or data pulled at runtime</li>
+        <li><strong>Tool descriptions</strong> — what tools are available and when to use them</li>
+        <li><strong>Tool outputs</strong> — what those tools returned</li>
+        <li><strong>User preferences</strong> — how this particular user wants to work</li>
+        <li><strong>Prior decisions</strong> — what was decided earlier in the workflow</li>
+      </ul>
+      <p>A model reasoning over a well-designed context window doesn't need a cleverly worded prompt. It has what it needs to reason well because the inputs are right.</p>
+
+      <hr />
+
+      <h2>The Real Skill: What Goes In and What Stays Out</h2>
+      <p>Context engineering is as much about exclusion as inclusion. Context windows are not free. Every token you add is a token the model has to process. Irrelevant context competes with relevant context for the model's attention. Too much noise and the model starts making mistakes — not because it isn't capable, but because you gave it a cluttered workspace.</p>
+      <p>The decisions that matter:</p>
+      <ul>
+        <li>What context should enter the model at this step?</li>
+        <li>What should stay outside and only be retrieved on demand?</li>
+        <li>What should be stored in memory and loaded next turn?</li>
+        <li>What should be handled by a tool rather than reasoned over inline?</li>
+        <li>What can be summarized rather than passed in full?</li>
+      </ul>
+      <p>These are product and architecture decisions as much as they are engineering decisions. They require understanding the task, the model's strengths and limits, and the information actually needed at each reasoning step.</p>
+
+      <hr />
+
+      <h2>Why the Term Matters</h2>
+      <p>"Prompt engineering" frames the problem as writing. You write better, you get better results. It puts the focus on the instruction text and implies that better phrasing is the lever.</p>
+      <p>"Context engineering" frames the problem as system design. You design a better information environment, you get better results. It puts the focus on what the model can see and reason over — and treats the prompt as one component of that environment, not the whole thing.</p>
+      <p>For single-turn chatbots, the distinction is minor. For production agent systems, it is the difference between an architecture that scales and one that breaks at complexity.</p>
+    `,
+  },
+
+  'llm-as-cpu-context-as-ram': {
+    description: 'A mental model for thinking about AI agents: the LLM is the CPU, the context window is RAM, files and databases are disk, and tools are external programs.',
+    html: `
+      <p>When people struggle to design agent systems, it is often because they don't have a clear mental model for what the components actually do. Here is one that I find useful.</p>
+
+      <hr />
+
+      <h2>The Mental Model</h2>
+      <ul>
+        <li><strong>The LLM is the CPU.</strong> It is the processing unit. It takes inputs, applies reasoning, and produces outputs. It doesn't store state between calls — it just processes what you give it.</li>
+        <li><strong>The context window is RAM.</strong> It is working memory. Whatever is in the context window is what the model can reason over. Fast, limited, and gone when the session ends.</li>
+        <li><strong>Files, databases, embeddings, and documents are disk.</strong> They are persistent storage. They hold information across sessions, at scale, and outside the model's active attention. The model can't reason over disk directly — it has to load things into RAM first.</li>
+        <li><strong>Tools are external programs.</strong> The model can call them, receive their outputs, and incorporate those outputs into its reasoning. The tool does the work that the model shouldn't do inline — running a query, calling an API, doing a calculation, reading a file.</li>
+      </ul>
+
+      <hr />
+
+      <h2>What the Agent's Job Actually Is</h2>
+      <p>The agent's job is not to "know everything." No model is trained on your internal data. No context window is large enough to hold your entire knowledge base. That is not how this works.</p>
+      <p>The agent's job is to:</p>
+      <ul>
+        <li>Pull the right information from disk into working memory (retrieval)</li>
+        <li>Call the right tools when the task requires external computation or data</li>
+        <li>Use feedback from tool outputs to continue reasoning</li>
+        <li>Decide when the task is complete and produce an output</li>
+      </ul>
+      <p>This is a coordination job more than a knowledge job. The model is orchestrating information flow, not memorizing facts.</p>
+
+      <hr />
+
+      <h2>Why Bigger Context Windows Don't Solve the Problem</h2>
+      <p>A common mistake: if the agent isn't reasoning well, give it a bigger context window. Load in more documents. Pass in more data. Surely more information helps.</p>
+      <p>It doesn't, reliably. And this is where the RAM analogy becomes useful.</p>
+      <p>More RAM helps — but bad memory management still creates bad systems. If you fill the context window with irrelevant information, the model has to process all of it. Important signals compete with noise. The model loses track of what matters. Performance degrades, often in ways that are hard to diagnose because the output still looks plausible.</p>
+      <p>The discipline is not "load everything." It is "load the right things at the right time." That requires knowing:</p>
+      <ul>
+        <li>What the model actually needs at this step</li>
+        <li>What can stay on disk until it's needed</li>
+        <li>What can be summarized rather than included verbatim</li>
+        <li>What should be handled by a tool rather than loaded into context</li>
+      </ul>
+
+      <hr />
+
+      <h2>The Practical Implication</h2>
+      <p>The future skill in AI product development is not prompting. It is context architecture — designing the information flow so the model always has what it needs and never has what it doesn't.</p>
+      <p>That means building retrieval systems that fetch the right chunks, not everything. It means building memory systems that persist what matters across turns, not the full conversation. It means defining tool boundaries precisely so the model knows when to call a tool versus when to reason inline.</p>
+      <p>The teams that build reliable agents are not the ones with the best prompts. They are the ones who have thought carefully about what goes into RAM, when, and why.</p>
+    `,
+  },
+
+  'why-agents-harder-than-chatbots': {
+    description: 'Chatbots answer one question. Agents run for many steps. That difference changes everything about how you design, evaluate, and operate them.',
+    html: `
+      <p>The jump from chatbot to agent feels smaller than it is. Both use language models. Both take user input and produce output. The underlying technology looks the same from the outside.</p>
+      <p>But the design challenge is completely different.</p>
+
+      <hr />
+
+      <h2>Chatbots Answer One Question</h2>
+      <p>A chatbot turn looks like this: user sends a message, model reads the message plus conversation history, model produces a response. Done. Even in a multi-turn conversation, each turn is structurally a single inference call. The model does not persist between messages. It does not take actions in the world. It does not need to track its own state across steps.</p>
+      <p>When a chatbot makes a mistake, the user sees it immediately. They ask again, rephrase, or give up. The blast radius of a single bad response is one response.</p>
+
+      <hr />
+
+      <h2>Agents Run for Many Steps</h2>
+      <p>An agent has to:</p>
+      <ul>
+        <li>Understand the goal</li>
+        <li>Break it into steps</li>
+        <li>Retrieve relevant knowledge</li>
+        <li>Call tools</li>
+        <li>Read tool feedback</li>
+        <li>Update its working state</li>
+        <li>Decide the next action</li>
+        <li>Avoid drifting from the original objective</li>
+        <li>Know when it is done</li>
+      </ul>
+      <p>Every tool call creates new context. Every result adds more tokens. Every step increases the chance that something goes sideways.</p>
+
+      <hr />
+
+      <h2>The Failure Modes That Don't Exist in Chatbots</h2>
+
+      <h3>Task drift</h3>
+      <p>An agent starts with a clear objective. Three tool calls in, the context has grown and some detail from an early tool output has started pulling the reasoning in a different direction. The agent is now working on a subtly different problem than the one it was given. Nobody told it to change direction — the accumulated context did.</p>
+      <p>Chatbots don't drift. They respond to whatever is in the current message. Agents drift because their reasoning evolves over a long sequence of inputs they are accumulating themselves.</p>
+
+      <h3>Compounding errors</h3>
+      <p>In a chatbot, a wrong answer is visible and isolated. In an agent, a wrong intermediate output gets passed to the next step as if it were correct. The next step reasons on top of it. The error is now embedded in the chain. By the time the final output is produced, the original error may be invisible — buried under several layers of downstream reasoning that all look sound.</p>
+
+      <h3>Tool boundary confusion</h3>
+      <p>Agents have to decide when to call a tool and when to reason inline. This is harder than it sounds. Models often try to simulate a tool result rather than calling the tool — especially when the tool call feels expensive or the model thinks it already knows the answer. The result is a hallucinated API response, a made-up database query result, or a plausible-looking computation that was never actually run.</p>
+
+      <h3>Knowing when to stop</h3>
+      <p>A chatbot always stops after one response. An agent has to determine when its task is complete — and that determination can be wrong in both directions. Stopping too early produces incomplete work. Stopping too late produces an agent that has taken actions beyond its mandate or spent ten times the intended token budget.</p>
+
+      <hr />
+
+      <h2>What This Means for Design</h2>
+      <p>Agent design is not just about model quality or prompt quality. It is about:</p>
+      <ul>
+        <li><strong>Context control</strong> — managing what accumulates in the window so the agent doesn't drift or get confused by irrelevant earlier outputs</li>
+        <li><strong>State management</strong> — deciding what needs to be tracked explicitly versus inferred from context</li>
+        <li><strong>Tool boundaries</strong> — defining clearly when the agent should call a tool and what constitutes a valid tool output</li>
+        <li><strong>Evaluation</strong> — testing agent behavior at the workflow level, not just the single-turn level</li>
+        <li><strong>Recovery</strong> — designing for what happens when an intermediate step fails, not just the happy path</li>
+      </ul>
+      <p>Most teams start building agents by treating them like better chatbots. They discover the gap between the two the hard way — usually somewhere between the third demo and the first production incident.</p>
+    `,
+  },
+
+  'context-engineering-new-product-skill': {
+    description: 'In AI products, users interact with a system — not just a model. Context engineering is where product, data, design, and engineering meet.',
+    html: `
+      <p>When someone builds a weak AI product, it usually looks like this: a language model connected to a text box. The user types something. The model responds. The product team calls it an AI assistant.</p>
+      <p>It often works well in the demo. It rarely works well in production, at scale, for real users with real jobs to do.</p>
+      <p>The gap between the demo and production is almost always a context engineering gap.</p>
+
+      <hr />
+
+      <h2>What Users Actually Interact With</h2>
+      <p>In an AI product, the user does not interact with a model. They interact with a system.</p>
+      <p>That system includes:</p>
+      <ul>
+        <li><strong>Prompts</strong> — the instructions that shape the model's behavior</li>
+        <li><strong>Retrieved knowledge</strong> — documents, records, and data fetched at runtime based on the user's query</li>
+        <li><strong>Memory</strong> — what the system knows about this user from prior sessions</li>
+        <li><strong>Tools</strong> — external functions the model can call to take action or get data</li>
+        <li><strong>Permissions</strong> — what this user is allowed to see and do</li>
+        <li><strong>Workflows</strong> — the structured process the model follows to complete a task</li>
+        <li><strong>Feedback loops</strong> — how the system learns from what the user does after receiving an output</li>
+      </ul>
+      <p>A generic assistant ignores most of this. It gives every user the same model with the same prompt. It doesn't know who the user is, what they've done before, what data they're allowed to access, or what workflows are relevant to their role.</p>
+      <p>A strong AI product is the opposite. It knows your role, your data, your permissions, your past decisions, and the tools available to act on your behalf. The context it assembles for the model at each step is specific, relevant, and constrained to what actually matters.</p>
+
+      <hr />
+
+      <h2>The Difference in Practice</h2>
+      <p>A weak AI product says: "Here is a chatbot. Ask anything."</p>
+      <p>A strong AI product says: "I know you are a media planner. I know your active campaigns, your budget pacing, your team's optimization rules, your historical performance benchmarks, and the channels you are authorized to adjust. Ask me what you actually need to know."</p>
+      <p>The model in both cases might be identical. The output quality is not. Because the context in the second case is doing the work that vague prompting cannot.</p>
+
+      <hr />
+
+      <h2>Why This Is a Product Skill, Not Just an Engineering Skill</h2>
+      <p>Context engineering requires decisions that go beyond writing code. It requires understanding:</p>
+      <ul>
+        <li><strong>Who the user is</strong> — their role, their mental model, what they actually need from the system</li>
+        <li><strong>What data is available</strong> — what can be retrieved, what is governed, what requires permissions</li>
+        <li><strong>How the task unfolds</strong> — what information is needed at which step, and in what form</li>
+        <li><strong>What failure looks like</strong> — what happens when the model gets irrelevant context, and how you detect it</li>
+      </ul>
+      <p>These are product questions answered with engineering tools. A product manager who understands context architecture can make better decisions about what data to retrieve and when. A designer who understands context constraints can build interfaces that surface the right information before the model needs it. A data engineer who understands context budgets can build retrieval pipelines that are selective rather than exhaustive.</p>
+      <p>Context engineering is where product, data, design, and engineering meet. It is the discipline that turns a language model into a product that is actually useful to someone with a real job to do.</p>
+
+      <hr />
+
+      <h2>The Skill Set Being Valued</h2>
+      <p>The teams building the most effective AI products are not necessarily the ones with the best models or the most sophisticated infrastructure. They are the ones who have thought most carefully about what context their model needs at each step — and built systems to deliver exactly that.</p>
+      <p>That discipline has a name now: context engineering. It is worth treating it as a first-class skill.</p>
+    `,
+  },
 };

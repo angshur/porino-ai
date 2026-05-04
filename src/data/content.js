@@ -8,6 +8,10 @@ export const patternsLibrary = [
         slug: 'foundations',
         articles: [
           { title: 'Why the Data Layer Is the Prerequisite for AI Agents', slug: 'data-layer-prerequisite-ai-agents', status: 'published' },
+          { title: 'Prompt Engineering vs Context Engineering', slug: 'prompt-vs-context-engineering', status: 'published' },
+          { title: 'The LLM as CPU, Context Window as RAM', slug: 'llm-as-cpu-context-as-ram', status: 'published' },
+          { title: 'Why Agents Are Harder Than Chatbots', slug: 'why-agents-harder-than-chatbots', status: 'published' },
+          { title: 'Context Engineering Is the New Product Skill', slug: 'context-engineering-new-product-skill', status: 'published' },
           { title: 'Orchestrator Patterns: Hub-and-Spoke, Hierarchical, Pipeline', slug: 'orchestrator-patterns', status: 'planned' },
           { title: 'Stateful vs Stateless Orchestrators — What Actually Matters', slug: 'stateful-vs-stateless-orchestrators', status: 'planned' },
         ],
@@ -39,6 +43,7 @@ export const patternsLibrary = [
         slug: 'evaluation-reliability',
         articles: [
           { title: 'How the Orchestrator Knows the Sub-Agent Did It Right', slug: 'orchestrator-evaluation', status: 'planned' },
+          { title: 'When More Agents Makes Things Worse', slug: 'when-more-agents-makes-things-worse', status: 'published' },
           { title: 'Hallucination in Multi-Agent Systems (It\'s Not Just the Model)', slug: 'hallucination-multi-agent', status: 'planned' },
           { title: 'Partial Failure Handling and Retry Strategies', slug: 'partial-failure-retry', status: 'planned' },
           { title: 'Observability: Trace IDs Across Agent Chains', slug: 'observability-trace-ids', status: 'planned' },
