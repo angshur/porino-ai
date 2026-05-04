@@ -69,6 +69,195 @@ export const articles = {
       <p>If you're a consultant or technical lead trying to help a business ship AI: the engagement that ends in production has the data layer conversation first. The engagement that ends in a stalled pilot skips it.</p>
     `,
   },
+  'agent-data-access': {
+    description: 'The dominant question in AI agent design is what the agent can do. In enterprise marketing and advertising, the more important question is what data the agent is actually allowed to see.',
+    html: `
+      <p>The dominant question in AI agent design is often framed as: what can the agent do? In enterprise marketing and advertising, that is the wrong starting point. The more important question is: what data can the agent actually see?</p>
+      <p>This question sits at the intersection of privacy, governance, identity, consent, access control, and auditability. In media and advertising, where data is often sensitive, partner-owned, consent-constrained, or commercially restricted, agent capability must be defined by data visibility. An AI agent that can take action without clear visibility rules is not an enterprise asset. It is a governance risk.</p>
+
+      <hr />
+
+      <h2>The Agent Visibility Problem</h2>
+      <p>Every enterprise agent operates within an implicit data boundary. That boundary determines what the agent can retrieve, reason over, summarize, recommend, or activate.</p>
+      <p>In a simple internal analytics setting, this may be straightforward. But AI agents blur organizational boundaries because they can retrieve, summarize, combine, and expose information across systems in ways that a single human analyst typically cannot.</p>
+      <p>This creates several practical questions every enterprise agent deployment needs to answer explicitly:</p>
+      <ul>
+        <li>Can the agent see user-level data or only aggregated data?</li>
+        <li>Can it access personally identifiable information?</li>
+        <li>Can it join CRM, commerce, and media exposure data?</li>
+        <li>Can it use clean room outputs?</li>
+        <li>Can it explain why a recommendation was made?</li>
+        <li>Can it show the underlying data lineage?</li>
+        <li>Can it produce an audit trail of what data it accessed?</li>
+        <li>Can different users get different answers based on permissions?</li>
+      </ul>
+      <p>These are not secondary design details. They define whether the agent can be deployed in a regulated, privacy-sensitive, enterprise environment.</p>
+
+      <hr />
+
+      <h2>Why Advertising Makes This Harder</h2>
+      <p>Advertising data is unusually complex because it often crosses organizational boundaries. A brand may own customer and transaction data. A publisher may own exposure and audience data. A retailer may own commerce signals. An agency may manage activation and reporting workflows. A platform may provide modeled conversions, reach estimates, or attribution outputs.</p>
+      <p>No single party should necessarily see all raw data. This is why data clean rooms have become important in the advertising and media ecosystem — they allow organizations to collaborate on data without exposing what should remain protected.</p>
+      <p>AI agents extend this question further: can an agent reason across collaborative data without violating the governance model? The clean room pattern is not just about data sharing — it becomes the constraint that shapes what the agent is allowed to do.</p>
+
+      <hr />
+
+      <h2>Consent as an Architectural Constraint</h2>
+      <p>Consent is not just a legal checkbox. In agentic systems, consent becomes an architectural constraint.</p>
+      <p>Apple's App Tracking Transparency requires apps to obtain user permission before tracking users across other companies' apps and websites. Google Consent Mode allows tag behavior to adjust based on user consent choices and supports conversion and behavioral modeling when consent signals limit observable data.</p>
+      <p>These examples show a broader industry shift: data availability is no longer uniform. Different users, regions, channels, and platforms produce different levels of observability. An AI agent must therefore understand not only the data itself, but the consent conditions under which that data was collected and can be used.</p>
+      <p>A marketing measurement agent should know whether:</p>
+      <ul>
+        <li>a conversion was directly observed or modeled;</li>
+        <li>a user-level join is permitted;</li>
+        <li>a segment can be activated or only analyzed;</li>
+        <li>data can be exported or must remain inside a governed environment;</li>
+        <li>reporting must be aggregated to meet privacy thresholds;</li>
+        <li>a recommendation is based on incomplete or modeled data.</li>
+      </ul>
+      <p>Without this context, the agent creates false confidence. It produces outputs that look authoritative but are based on data the agent didn't fully understand.</p>
+
+      <hr />
+
+      <h2>Three Layers of Control</h2>
+      <p>Enterprise AI agents require three layers of control, and all three need to be designed explicitly before the agent is built.</p>
+      <p><strong>Identity-aware access.</strong> The agent should not have a universal view of the enterprise. It should inherit the user's permissions or operate under a clearly defined service role. An agent invoked by a media analyst should not be able to access data that media analyst couldn't access directly.</p>
+      <p><strong>Purpose-aware access.</strong> Data that is available for measurement may not be available for activation. Data available for internal analysis may not be available for client-facing reporting. Purpose is a separate dimension from identity — the same user may have different access depending on what the agent is being asked to do.</p>
+      <p><strong>Auditability.</strong> The enterprise should be able to answer: what did the agent access? What tools did it call? What data was used in the response? What recommendation did it generate? Was the output shown to a user, sent externally, or used to trigger an action? Without this, you cannot debug failures, satisfy compliance requirements, or investigate unexpected outputs.</p>
+
+      <hr />
+
+      <h2>The Agent Data Visibility Matrix</h2>
+      <p>Before deploying an AI agent in marketing or advertising, define a data visibility matrix. It should answer eight questions explicitly:</p>
+      <ul>
+        <li><strong>What data sources can the agent access?</strong> Defines analytical scope.</li>
+        <li><strong>What level of granularity is allowed?</strong> Prevents inappropriate user-level exposure.</li>
+        <li><strong>What user role is invoking the agent?</strong> Enforces role-based permissions.</li>
+        <li><strong>What consent model applies?</strong> Aligns outputs with privacy obligations.</li>
+        <li><strong>What joins are allowed?</strong> Controls identity and partner-data risk.</li>
+        <li><strong>What outputs can be exported?</strong> Prevents leakage of sensitive data.</li>
+        <li><strong>What actions can the agent trigger?</strong> Separates analysis from activation.</li>
+        <li><strong>What logs are retained?</strong> Enables audit and compliance.</li>
+      </ul>
+      <p>This framework turns agent visibility from an implicit risk into an explicit design decision. The matrix should be completed before any prompt engineering, orchestration design, or tool selection happens.</p>
+
+      <hr />
+
+      <h2>The Control Surface Is the Data Layer</h2>
+      <p>As AI agents become more capable, data visibility becomes the primary control surface.</p>
+      <p>A trustworthy enterprise agent is not the one with the broadest access. It is the one with the right access, for the right purpose, with the right audit trail. Agent design must be tied to enterprise control planes, not just prompt design.</p>
+      <p>The teams that ship agents that stay in production are the ones that answered these questions before they built anything. The teams that answer them after deployment spend their time managing incidents.</p>
+    `,
+  },
+  'snowflake-wins-and-doesnt': {
+    description: 'A serious evaluation of Snowflake should not reduce the platform to a universal solution. It wins in specific architectural contexts and is less compelling in others. Here is an honest breakdown.',
+    html: `
+      <p>Snowflake is often discussed as a cloud data platform, but its strategic relevance has expanded beyond storage and analytics. With the rise of AI, data clean rooms, application development, and agentic workflows, Snowflake is increasingly positioning itself as an enterprise data and AI operating layer.</p>
+      <p>A serious evaluation, though, should not reduce Snowflake to a universal solution. It wins in specific architectural contexts. It is less compelling in others. The better question is not "Is Snowflake good?" — it's "Where does Snowflake create structural advantage, and where should it be complemented by something else?"</p>
+
+      <hr />
+
+      <h2>Where Snowflake Wins</h2>
+      <p>Snowflake wins when the problem is governed data collaboration, scalable analytics, cross-functional access, and repeatable data products. It is especially powerful when marketing, commerce, CRM, media, and customer data need to come together in one governed environment.</p>
+      <p>Modern marketing analytics is not a single-system problem. A brand may need to combine paid media spend, ad exposure, web analytics, CRM opportunities, offline conversions, product purchases, loyalty data, retail media signals, and customer support records. These datasets often live in different systems, have different owners, and come with different permissions.</p>
+      <p>Snowflake's core value is strongest when the enterprise wants to reduce fragmentation without giving up governance. The combination of structured and unstructured data, governed access, and AI workflows inside a single platform is genuinely differentiated for this use case.</p>
+
+      <h3>Data Collaboration</h3>
+      <p>One of Snowflake's clearest advantages in advertising is data collaboration. Advertising measurement increasingly requires collaboration between brands, publishers, retailers, agencies, and platforms — but privacy expectations and regulatory constraints make raw data sharing difficult.</p>
+      <p>Snowflake's Data Clean Rooms allow controlled collaboration without unrestricted data movement. The native implementation — where both parties are on Snowflake — removes the need for a separate clean room vendor and keeps the collaboration inside the same governance model as the rest of the data stack.</p>
+      <p>This is a strong fit for campaign measurement across publisher and advertiser data, audience overlap analysis, retail media measurement, partner-safe attribution, reach and frequency analysis, incrementality studies, and privacy-preserving customer collaboration.</p>
+
+      <h3>AI Agents on Governed Data</h3>
+      <p>Snowflake's agentic AI direction is strategically important for a specific reason: most enterprise AI pilots fail when they remain disconnected from governed data and operational workflows. A generic agent may be impressive in a demo, but enterprise buyers need agents that can operate within permission boundaries, connect to systems of record, produce auditable outputs, and support repeatable workflows.</p>
+      <p>Snowflake's advantage is strongest when AI agents need to work over governed analytical data — natural language campaign analysis, audience and segment exploration, budget planning workflows, clean room measurement explanation, and executive summaries grounded in governed metrics. These are use cases where the data governance layer is as important as the model capability.</p>
+
+      <hr />
+
+      <h2>Where Snowflake Does Not Automatically Win</h2>
+      <p><strong>It is not the system of engagement for every business workflow.</strong> Marketers live in Google Ads, Meta Ads, Salesforce, HubSpot, Adobe, Braze, and internal planning systems. Even if Snowflake becomes the governed data layer, workflow execution often occurs elsewhere. Snowflake powers the analysis; it doesn't replace the tools people use to act.</p>
+      <p><strong>It is not optimized for ultra-low latency.</strong> Some bidding, personalization, fraud detection, or event-streaming workloads require architectures built for real-time decisioning. Snowflake is not that system. You need a streaming layer upstream — Kafka, Kinesis, Pub/Sub — landing into Snowpipe or a dedicated real-time store. Don't try to make Snowflake real-time for workloads where milliseconds matter.</p>
+      <p><strong>It does not solve semantic alignment.</strong> A company can centralize data in Snowflake and still have inconsistent metric definitions, weak campaign taxonomy, poor data quality, and unclear ownership. Snowflake provides infrastructure. The organization must still design the semantic layer, governance model, and operating process. The platform does not substitute for this work.</p>
+      <p><strong>It does not eliminate the need for user-facing product design.</strong> Non-technical marketers do not want to think in tables, joins, schemas, and warehouse tasks. They want answers, workflows, planning tools, and decision support. Snowflake can power these experiences, but the application layer still matters and is not included.</p>
+
+      <hr />
+
+      <h2>The Honest Strategic Position</h2>
+      <p>The most credible way to describe Snowflake is not as a replacement for every marketing application. It is better understood as the governed data and AI foundation on which analytical applications, collaboration workflows, and enterprise agents can be built.</p>
+      <p>Snowflake wins when the buyer cares about governed enterprise data, secure collaboration, cross-functional analytics, clean rooms, scalable data products, AI grounded in enterprise context, and repeatable analytical workflows.</p>
+      <p>Snowflake is less likely to be the full answer when the buyer only needs a simple dashboard, a lightweight marketing report, a point solution for one ad platform, a real-time bidding engine, or a tactical automation that does not require data collaboration.</p>
+      <p>Snowflake's strategic value is highest when data complexity, governance, collaboration, and AI intersect. In advertising and media, that intersection is becoming more important as signal loss, privacy constraints, fragmented customer journeys, and AI adoption all increase the need for a governed data foundation.</p>
+      <p>The strongest Snowflake story is also an honest one: it is the foundation that allows enterprises to build trustworthy analytics, clean room collaboration, and agentic workflows on top of governed data. That is where it wins — and knowing where it doesn't win is what makes the story credible.</p>
+    `,
+  },
+  'user-facing-vs-internal-analytics': {
+    description: 'Internal BI answers what happened. User-facing analytics helps users decide what to do next. The distinction matters more in marketing than almost anywhere else.',
+    html: `
+      <p>For decades, analytics inside enterprises has been organized around internal business intelligence. Data teams built dashboards. Analysts created reports. Executives consumed summaries. This model is useful, but it is no longer sufficient.</p>
+      <p>In marketing, media, and advertising, the next generation of analytics will not be limited to dashboards for analysts. It will increasingly be user-facing, workflow-driven, and embedded into the daily decisions of marketers, sellers, planners, and executives. The distinction between internal BI and user-facing analytics is now critical — and it changes what you build, what you prioritize, and what success looks like.</p>
+
+      <hr />
+
+      <h2>Internal BI: What It Does and Where It Stops</h2>
+      <p>Internal BI is primarily designed for visibility. It answers: what happened? How are we performing? Which campaigns are up or down? Are we on track against targets?</p>
+      <p>The primary users are analysts, data teams, finance, operations, and executives. The output is usually a dashboard, report, spreadsheet, or notebook. Internal BI assumes the user knows how to interpret metrics. It often requires analytical maturity. It provides data but does not guide action.</p>
+      <p>This works well for monitoring. It works less well for decisioning. Showing a marketer that CPA increased 18% last week does not tell them what to do about it. The gap between "here is what happened" and "here is what to do next" is where most BI investments stop — and where the real value lives.</p>
+
+      <hr />
+
+      <h2>User-Facing Analytics: The Productized Model</h2>
+      <p>User-facing analytics takes a different approach. It turns analysis into a product experience.</p>
+      <p>Instead of simply showing data, it helps users make decisions. Instead of requiring users to interpret every metric, it provides explanations, recommendations, simulations, and next steps. In marketing, this means:</p>
+      <ul>
+        <li>Budget optimization with scenario modeling</li>
+        <li>Campaign pacing recommendations with risk flags</li>
+        <li>Incrementality interpretation in plain language</li>
+        <li>Executive-ready performance narratives</li>
+        <li>Audience overlap analysis with activation guidance</li>
+        <li>Forecast-driven decision support</li>
+        <li>Media planning workflows with constraint handling</li>
+      </ul>
+      <p>This is where marketing science becomes operational. The models, the measurement frameworks, the statistical rigor — none of it creates value sitting in a notebook. The value is created when it reaches the person making the budget decision, in a form they can actually use.</p>
+
+      <hr />
+
+      <h2>The Difference in Product Philosophy</h2>
+      <p>The difference between internal BI and user-facing analytics is not only technical. It is philosophical.</p>
+      <p>Internal BI asks: how do we expose the data? User-facing analytics asks: how do we help the user make a better decision?</p>
+      <p>Internal BI is metric-centric. User-facing analytics is workflow-centric. Internal BI ends with a dashboard. User-facing analytics ends with a recommendation, plan, simulation, or action. Internal BI is built for people who understand the data. User-facing analytics is built for people who need the data translated into business judgment.</p>
+      <p>This distinction matters most in marketing, where many users are not data specialists but still make high-impact budget and strategy decisions daily.</p>
+
+      <hr />
+
+      <h2>Two Examples</h2>
+      <h3>Budget Optimization</h3>
+      <p>In an internal BI model, the user sees spend, impressions, clicks, conversions, CPA, ROAS, and revenue by channel. They interpret it. They form a view. They maybe act on it.</p>
+      <p>In a user-facing analytics model, the system goes further. It explains which channels are underperforming relative to their modeled efficiency curve, where spend is pacing too quickly against forecast, which campaigns have enough statistical confidence to trust the read, and what budget shift would improve outcomes — with the caveat that Campaign C's lift may not be incremental before it's been tested.</p>
+      <p>That is not just reporting. That is decision support that the user can act on without a separate analyst interpreting it for them.</p>
+
+      <h3>Executive Reporting</h3>
+      <p>An internal BI dashboard shows revenue increased, CPA declined, ROAS improved.</p>
+      <p>A user-facing analytics experience produces a narrative: performance improved primarily because paid search efficiency increased in the final two weeks of the quarter. However, the improvement may be partially overstated because modeled conversions increased after consent-denied traffic rose. The strongest confirmed lift came from branded search and returning customer segments, while new customer acquisition remained flat.</p>
+      <p>Metrics, caveats, interpretation, and business implications in one output. That is what executives actually need — not more charts.</p>
+
+      <hr />
+
+      <h2>What This Requires From the Data Layer</h2>
+      <p>User-facing analytics still requires governed data infrastructure. A marketer-friendly interface is only useful if the underlying data is trustworthy.</p>
+      <p>The data layer needs to support it specifically:</p>
+      <ul>
+        <li><strong>Semantic consistency.</strong> "Revenue" needs one definition that every output uses. "Conversion" needs to be the same event across channels. The semantic layer is not optional for user-facing analytics — it's the foundation that makes the outputs trustworthy enough for non-analysts to act on.</li>
+        <li><strong>Lineage and provenance.</strong> When a recommendation is based on modeled data, the user-facing product should say so. When a metric is consent-constrained and incomplete, the explanation should reflect that. Trustworthy outputs require trustworthy metadata.</li>
+        <li><strong>Clean room integration.</strong> User-facing analytics in advertising increasingly depends on collaboration data — overlap analysis, publisher measurement, retail media lift. That data flows through clean room architectures. The analytics product needs to consume it cleanly.</li>
+      </ul>
+
+      <hr />
+
+      <h2>The Architecture Implication</h2>
+      <p>Building user-facing analytics is not the same as building a better dashboard. It requires treating the analytical layer as a product, with users, workflows, and outcomes — not just metrics.</p>
+      <p>The teams that get this right are the ones that start with the user's decision, work backwards to the data needed to support it, and build the interface around the decision rather than around the data model. The data model is an implementation detail. The decision is the product.</p>
+      <p>Marketing science cannot stay in notebooks. The opportunity is to make measurement operational — and that means building analytical products that reach the person making the budget decision, not just the analyst who supports them.</p>
+    `,
+  },
   'snowflake-dbt-canonical-stack': {
     description: 'The canonical stack for marketing measurement data engineering: Snowflake as the warehouse, dbt for transformation, Cortex AI for ML workflows. Architecture patterns, cost traps, and what actually breaks in production.',
     html: `

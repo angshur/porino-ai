@@ -48,7 +48,7 @@ export const patternsLibrary = [
         name: 'Governance & Security',
         slug: 'governance-security',
         articles: [
-          { title: 'What Data Can Your Agent Actually See?', slug: 'agent-data-access', status: 'planned' },
+          { title: 'What Data Can Your Agent Actually See?', slug: 'agent-data-access', status: 'published' },
           { title: 'Audit Trails for Autonomous Systems', slug: 'audit-trails-agents', status: 'planned' },
           { title: 'Access Control Patterns for Agent Networks', slug: 'access-control-agent-networks', status: 'planned' },
         ],
@@ -141,7 +141,7 @@ export const patternsLibrary = [
         slug: 'patterns',
         articles: [
           { title: 'Sub-Second at Scale', slug: 'sub-second-at-scale', status: 'planned' },
-          { title: 'User-Facing Analytics vs Internal BI', slug: 'user-facing-vs-internal-analytics', status: 'planned' },
+          { title: 'User-Facing Analytics vs Internal BI', slug: 'user-facing-vs-internal-analytics', status: 'published' },
         ],
       },
     ],
@@ -198,7 +198,7 @@ export const patternsLibrary = [
         name: 'Snowflake',
         slug: 'snowflake',
         articles: [
-          { title: 'Where Snowflake Wins and Where It Doesn\'t', slug: 'snowflake-wins-and-doesnt', status: 'planned' },
+          { title: 'Where Snowflake Wins and Where It Doesn\'t', slug: 'snowflake-wins-and-doesnt', status: 'published' },
           { title: 'Snowflake vs BigQuery Honest Comparison', slug: 'snowflake-vs-bigquery', status: 'planned' },
           { title: 'Cost Modeling at Different Scales', slug: 'snowflake-cost-modeling', status: 'planned' },
           { title: 'Snowflake + dbt + Cortex AI: The Marketing Measurement Stack', slug: 'snowflake-dbt-canonical-stack', status: 'published' },
