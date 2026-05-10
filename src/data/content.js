@@ -104,8 +104,9 @@ export const patternsLibrary = [
         name: 'Patterns',
         slug: 'patterns',
         articles: [
-          { title: 'Why Parquet Wasn\'t Enough', slug: 'why-parquet-wasnt-enough', status: 'planned' },
-          { title: 'The Medallion Architecture Explained', slug: 'medallion-architecture', status: 'planned' },
+          { title: 'Why Parquet Wasn\'t Enough', slug: 'why-parquet-wasnt-enough', status: 'published' },
+          { title: 'Database Disassembly — The Trend Reshaping Data Infrastructure', slug: 'database-disassembly', status: 'published' },
+          { title: 'The Medallion Architecture Explained', slug: 'medallion-architecture', status: 'published' },
         ],
       },
     ],
@@ -206,7 +207,7 @@ export const patternsLibrary = [
         slug: 'snowflake',
         articles: [
           { title: 'Where Snowflake Wins and Where It Doesn\'t', slug: 'snowflake-wins-and-doesnt', status: 'published' },
-          { title: 'Snowflake vs BigQuery Honest Comparison', slug: 'snowflake-vs-bigquery', status: 'planned' },
+          { title: 'Snowflake vs BigQuery Honest Comparison', slug: 'snowflake-vs-bigquery', status: 'published' },
           { title: 'Cost Modeling at Different Scales', slug: 'snowflake-cost-modeling', status: 'planned' },
           { title: 'Snowflake + dbt + Cortex AI: The Marketing Measurement Stack', slug: 'snowflake-dbt-canonical-stack', status: 'published' },
           { title: 'Privacy-Safe Clean Room Measurement Architecture', slug: 'clean-room-measurement-architecture', status: 'published' },
@@ -217,7 +218,7 @@ export const patternsLibrary = [
         slug: 'databricks',
         articles: [
           { title: 'When Databricks Beats Snowflake', slug: 'databricks-beats-snowflake', status: 'planned' },
-          { title: 'Delta Lake vs Iceberg on Databricks', slug: 'delta-lake-vs-iceberg-databricks', status: 'planned' },
+          { title: 'Delta Lake vs Iceberg on Databricks', slug: 'delta-lake-vs-iceberg-databricks', status: 'published' },
           { title: 'Unity Catalog and the Governance Layer', slug: 'unity-catalog-governance', status: 'planned' },
           { title: 'Databricks for ML vs for Data Engineering', slug: 'databricks-ml-vs-data-engineering', status: 'planned' },
         ],
