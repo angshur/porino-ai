@@ -138,6 +138,15 @@ export const patternsLibrary = [
           { title: 'Training-Serving Skew: The Silent Killer', slug: 'training-serving-skew', status: 'planned' },
         ],
       },
+      {
+        name: 'Marketing Measurement',
+        slug: 'marketing-measurement',
+        articles: [
+          { title: 'The Marketing Data Stack — Silver Step 1 and Why Everyone Skips It', slug: 'marketing-data-silver-step-1', status: 'published' },
+          { title: 'Clean Room Architecture — When You Need It and How to Build It', slug: 'clean-room-architecture-when-and-how', status: 'published' },
+          { title: 'Identity Resolution at Scale — The Three-Layer Stack', slug: 'identity-resolution-three-layer-stack', status: 'published' },
+        ],
+      },
     ],
   },
   {
