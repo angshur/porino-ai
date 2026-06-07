@@ -1,0 +1,295 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const modules = await getCollection('learn');
+  return modules.map((module) => ({
+    params: { slug: module.slug },
+    props: { module },
+  }));
+}
+
+const { module } = Astro.props;
+const { Content } = await module.render();
+---
+
+<Layout title={module.data.title} description={module.data.description}>
+  <div class="page">
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="breadcrumb"><a href="/learn">Learn</a></div>
+        <h1 class="page-title">{module.data.title}</h1>
+        <div class="module-meta">
+          {module.data.readTime && (
+            <span class="meta-read-time">{module.data.readTime} read</span>
+          )}
+          {module.data.audience && (
+            <>
+              <span class="meta-sep">·</span>
+              <span class="meta-audience">{module.data.audience}</span>
+            </>
+          )}
+        </div>
+        <p class="module-desc">{module.data.description}</p>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="page-body-inner">
+        <div class="prose">
+          <Content />
+        </div>
+
+        <div class="next-steps">
+          <div class="next-steps-title">Want to go deeper?</div>
+          <p class="next-steps-desc">
+            I work with teams building agentic AI systems — on the architecture decisions that determine
+            whether the system is reliable, auditable, and extensible.
+          </p>
+          <a href="/work-with-me" class="next-steps-cta">Work with me &rarr;</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page {
+    min-height: 80vh;
+  }
+
+  .page-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 56px 24px 36px;
+  }
+
+  .page-header-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 20px;
+  }
+
+  .breadcrumb a {
+    color: var(--color-text-tertiary);
+    transition: color 0.15s;
+  }
+
+  .breadcrumb a:hover {
+    color: var(--color-text-secondary);
+  }
+
+  .page-title {
+    font-size: 26px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    line-height: 1.35;
+    margin: 0 0 16px;
+  }
+
+  .module-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .meta-read-time {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+  }
+
+  .meta-sep {
+    font-size: 13px;
+    color: var(--color-text-tertiary);
+  }
+
+  .meta-audience {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: capitalize;
+    color: var(--color-accent);
+    background-color: rgba(94, 106, 210, 0.1);
+    border: 1px solid rgba(94, 106, 210, 0.2);
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  .module-desc {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0;
+    max-width: 560px;
+  }
+
+  .page-body {
+    padding: 48px 24px 100px;
+  }
+
+  .page-body-inner {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .prose :global(h2) {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--color-text-primary);
+    margin: 40px 0 14px;
+    line-height: 1.4;
+  }
+
+  .prose :global(h3) {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 28px 0 10px;
+  }
+
+  .prose :global(p) {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.75;
+    margin: 0 0 18px;
+  }
+
+  .prose :global(strong) {
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+
+  .prose :global(em) {
+    color: var(--color-text-primary);
+    font-style: italic;
+  }
+
+  .prose :global(ul), .prose :global(ol) {
+    margin: 0 0 18px;
+    padding-left: 20px;
+  }
+
+  .prose :global(li) {
+    font-size: 15px;
+    color: var(--color-text-secondary);
+    line-height: 1.75;
+    margin-bottom: 6px;
+  }
+
+  .prose :global(li strong) {
+    color: var(--color-text-primary);
+  }
+
+  .prose :global(table) {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 24px;
+    font-size: 13px;
+  }
+
+  .prose :global(th) {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .prose :global(td) {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+    vertical-align: top;
+  }
+
+  .prose :global(td strong) {
+    color: var(--color-text-primary);
+    font-weight: 600;
+  }
+
+  .prose :global(pre) {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    padding: 20px;
+    overflow-x: auto;
+    margin: 0 0 24px;
+  }
+
+  .prose :global(code) {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+  }
+
+  .prose :global(p code) {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 13px;
+  }
+
+  .prose :global(blockquote) {
+    border-left: 2px solid var(--color-accent);
+    margin: 0 0 18px;
+    padding: 4px 0 4px 20px;
+  }
+
+  .prose :global(blockquote p) {
+    color: var(--color-text-tertiary);
+    font-style: italic;
+    margin: 0;
+  }
+
+  .prose :global(hr) {
+    border: none;
+    border-top: 1px solid var(--color-border);
+    margin: 40px 0;
+  }
+
+  .next-steps {
+    margin-top: 64px;
+    padding: 28px 32px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+  }
+
+  .next-steps-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+  }
+
+  .next-steps-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin: 0 0 16px;
+  }
+
+  .next-steps-cta {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    transition: color 0.15s;
+  }
+
+  .next-steps-cta:hover {
+    color: var(--color-accent-hover);
+  }
+</style>

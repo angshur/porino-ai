@@ -1,0 +1,161 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const modules = (await getCollection('learn')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<Layout title="Learn" description="Structured reference guides on agentic AI systems — for operators and leaders building with AI.">
+  <div class="page">
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="breadcrumb">Porino</div>
+        <h1 class="page-title">Learn</h1>
+        <p class="page-desc">
+          Structured reference guides on agentic AI systems. Written for operators and business
+          leaders — not engineers. Each module takes 10–15 minutes and leaves you with something actionable.
+        </p>
+        <div class="page-meta">{modules.length} modules</div>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="page-body-inner">
+        {modules.map((module) => (
+          <a href={`/learn/${module.slug}`} class="module-row">
+            <div class="module-meta">
+              {module.data.readTime && <span class="module-read-time">{module.data.readTime}</span>}
+              {module.data.audience && (
+                <span class="module-audience">{module.data.audience}</span>
+              )}
+            </div>
+            <div class="module-content">
+              <div class="module-title">{module.data.title}</div>
+              <div class="module-desc">{module.data.description}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page {
+    min-height: 80vh;
+  }
+
+  .page-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 56px 24px 40px;
+  }
+
+  .page-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 12px;
+  }
+
+  .page-desc {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0 0 16px;
+    max-width: 560px;
+  }
+
+  .page-meta {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+  }
+
+  .page-body {
+    padding: 8px 24px 80px;
+  }
+
+  .page-body-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .module-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 32px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color 0.15s;
+    border-radius: 4px;
+  }
+
+  .module-row:first-child {
+    border-top: 1px solid var(--color-border);
+    margin-top: 24px;
+  }
+
+  .module-row:hover .module-title {
+    color: var(--color-accent);
+  }
+
+  .module-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 2px;
+  }
+
+  .module-read-time {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+  }
+
+  .module-audience {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: capitalize;
+    color: var(--color-accent);
+    background-color: rgba(94, 106, 210, 0.1);
+    border: 1px solid rgba(94, 106, 210, 0.2);
+    padding: 2px 7px;
+    border-radius: 3px;
+    width: fit-content;
+  }
+
+  .module-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .module-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+    line-height: 1.4;
+    transition: color 0.15s;
+  }
+
+  .module-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    max-width: 640px;
+  }
+</style>

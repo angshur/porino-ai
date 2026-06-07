@@ -1,0 +1,309 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Work With Me" description="Agentic AI architecture consulting. Three engagement types depending on what you need.">
+  <div class="page">
+    <div class="page-header">
+      <div class="page-header-inner">
+        <div class="breadcrumb">Porino</div>
+        <h1 class="page-title">Work With Me</h1>
+        <p class="page-desc">
+          I work with teams building agentic AI systems — on the architecture decisions that determine
+          whether the system is reliable, auditable, and extensible. Three engagement types depending on what you need.
+        </p>
+      </div>
+    </div>
+
+    <div class="page-body">
+      <div class="page-body-inner">
+
+        <div class="tiers">
+          <div class="tier">
+            <div class="tier-header">
+              <div class="tier-name">Architecture Clarity Session</div>
+              <div class="tier-price">$750</div>
+            </div>
+            <div class="tier-desc">
+              A 90-minute structured review of your agentic system decisions. I'll look at your
+              orchestration layer, context design, and trust boundary — then give you a written
+              summary within 24 hours with specific recommendations.
+            </div>
+            <div class="tier-details">
+              <div class="tier-detail-row">
+                <span class="tier-detail-label">Format</span>
+                <span class="tier-detail-value">90 min video call + written summary</span>
+              </div>
+              <div class="tier-detail-row">
+                <span class="tier-detail-label">Best for</span>
+                <span class="tier-detail-value">Teams with a system in progress that needs a second opinion</span>
+              </div>
+              <div class="tier-detail-row">
+                <span class="tier-detail-label">Deliverable</span>
+                <span class="tier-detail-value">Written summary with specific next steps within 24h</span>
+              </div>
+            </div>
+            <a href="https://cal.com/angshuman" class="tier-cta">Book a session &rarr;</a>
+          </div>
+
+          <div class="tier">
+            <div class="tier-header">
+              <div class="tier-name">Agentic Strategy Workshop</div>
+              <div class="tier-price">$3,000</div>
+            </div>
+            <div class="tier-desc">
+              A half-day working session covering orchestration layer design, context architecture,
+              and build vs. buy decisions for your specific workflow. Ends with a written decision
+              document you can hand to your engineering team.
+            </div>
+            <div class="tier-details">
+              <div class="tier-detail-row">
+                <span class="tier-detail-label">Format</span>
+                <span class="tier-detail-value">Half-day (4h) — remote or in-person</span>
+              </div>
+              <div class="tier-detail-row">
+                <span class="tier-detail-label">Best for</span>
+                <span class="tier-detail-value">Teams starting a new agentic system or stuck on architecture</span>
+              </div>
+              <div class="tier-detail-row">
+                <span class="tier-detail-label">Deliverable</span>
+                <span class="tier-detail-value">Architecture decision document + parallelism map</span>
+              </div>
+            </div>
+            <a href="https://cal.com/angshuman" class="tier-cta">Book a session &rarr;</a>
+          </div>
+
+          <div class="tier">
+            <div class="tier-header">
+              <div class="tier-name">Embedded Advisor</div>
+              <div class="tier-price">$5,000<span class="tier-price-unit">/mo</span></div>
+            </div>
+            <div class="tier-desc">
+              Ongoing monthly engagement. Weekly async review of decisions, code, and architecture
+              choices — plus one live session per month. I stay close to the build and catch problems
+              before they compound.
+            </div>
+            <div class="tier-details">
+              <div class="tier-detail-row">
+                <span class="tier-detail-label">Format</span>
+                <span class="tier-detail-value">Weekly async + one live session/month</span>
+              </div>
+              <div class="tier-detail-row">
+                <span class="tier-detail-label">Best for</span>
+                <span class="tier-detail-value">Teams building a production agentic system over 2–6 months</span>
+              </div>
+              <div class="tier-detail-row">
+                <span class="tier-detail-label">Commitment</span>
+                <span class="tier-detail-value">Month-to-month, two slots available</span>
+              </div>
+            </div>
+            <a href="https://cal.com/angshuman" class="tier-cta">Book a session &rarr;</a>
+          </div>
+        </div>
+
+        <div class="footer-note">
+          <div class="footer-note-title">Not sure which fits?</div>
+          <p class="footer-note-desc">
+            Start with an Architecture Clarity Session. If there's a larger engagement that makes sense, we'll figure it out from there.
+            No sales process — just a conversation about what you're building.
+          </p>
+          <a href="https://cal.com/angshuman" class="cta-link">Book a 90-minute session &rarr;</a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .page {
+    min-height: 80vh;
+  }
+
+  .page-header {
+    border-bottom: 1px solid var(--color-border);
+    padding: 56px 24px 40px;
+  }
+
+  .page-header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+    color: var(--color-text-tertiary);
+    margin-bottom: 16px;
+  }
+
+  .page-title {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    margin: 0 0 12px;
+  }
+
+  .page-desc {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0;
+    max-width: 560px;
+  }
+
+  .page-body {
+    padding: 48px 24px 80px;
+  }
+
+  .page-body-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .tiers {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .tier {
+    padding: 36px 0;
+    border-bottom: 1px solid var(--color-border);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 0 64px;
+  }
+
+  .tier:first-child {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .tier-header {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .tier-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .tier-price {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .tier-price-unit {
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--color-text-secondary);
+  }
+
+  .tier-desc {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: 20px;
+    max-width: 420px;
+  }
+
+  .tier-cta {
+    grid-column: 1;
+    grid-row: 3;
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    background-color: var(--color-accent);
+    padding: 8px 16px;
+    border-radius: 5px;
+    transition: background-color 0.15s;
+    width: fit-content;
+    align-self: start;
+  }
+
+  .tier-cta:hover {
+    background-color: var(--color-accent-hover);
+  }
+
+  .tier-details {
+    grid-column: 2;
+    grid-row: 1 / 4;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-self: center;
+  }
+
+  .tier-detail-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  .tier-detail-row:first-child {
+    border-top: 1px solid var(--color-border-subtle);
+  }
+
+  .tier-detail-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-text-tertiary);
+  }
+
+  .tier-detail-value {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+  }
+
+  .footer-note {
+    margin-top: 56px;
+    padding: 32px;
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    max-width: 560px;
+  }
+
+  .footer-note-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 10px;
+  }
+
+  .footer-note-desc {
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin: 0 0 16px;
+  }
+
+  .cta-link {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-accent);
+    transition: color 0.15s;
+  }
+
+  .cta-link:hover {
+    color: var(--color-accent-hover);
+  }
+</style>
