@@ -1341,6 +1341,398 @@ export const articles = {
     `,
   },
 
+  'circuit-breakers-sub-agents': {
+    description: 'When a sub-agent or tool provider fails, what stops the failure from cascading? The circuit breaker pattern adapted for agentic systems.',
+    html: `
+      <p>A circuit breaker in electrical engineering does one thing: when current exceeds a safe threshold, it opens the circuit and stops the flow. The house doesn't burn down because the breaker trips first.</p>
+      <p>In distributed systems, the circuit breaker pattern does the same thing for service calls. When a downstream service is failing — returning errors, timing out, or responding slowly — you stop sending it requests rather than queuing up failures. The caller gets a fast fail. The failing service gets breathing room to recover.</p>
+      <p>In agentic systems, the same problem appears in a different form: what happens when a sub-agent or tool provider fails? Without a circuit breaker, the orchestrator keeps calling the failing component, accumulating errors, burning token budget, and potentially degrading the quality of the entire workflow.</p>
+
+      <hr />
+
+      <h2>Why Agents Need Circuit Breakers</h2>
+      <p>In a microservices architecture, a circuit breaker trips after N consecutive failures. In an agent system, the equivalent is more nuanced.</p>
+      <p>Agent workflows are often long-running and stateful. A sub-agent failure at step four of twelve doesn't just affect step four — it affects every downstream step that depended on step four's output. The orchestrator has three options: retry indefinitely (expensive and often futile), halt the entire workflow (costly for the work already done), or invoke a fallback path.</p>
+      <p>The circuit breaker pattern for agents makes the third option explicit rather than accidental.</p>
+
+      <hr />
+
+      <h2>The Three States</h2>
+      <p>A circuit breaker for agent sub-calls has the same three states as in distributed systems:</p>
+      <p><strong>Closed (normal operation).</strong> Calls pass through to the sub-agent or tool. Failures are counted. If failures exceed the threshold within the window, the breaker opens.</p>
+      <p><strong>Open (failing fast).</strong> Calls to this sub-agent are immediately returned as failures without attempting the call. The orchestrator receives a fast fail and can route to a fallback path. The breaker stays open for a cooldown period.</p>
+      <p><strong>Half-open (testing recovery).</strong> After the cooldown period, a limited number of calls are allowed through to test whether the sub-agent has recovered. If they succeed, the breaker closes. If they fail, it opens again with a longer cooldown.</p>
+
+      <hr />
+
+      <h2>What Constitutes a Failure in Agent Context</h2>
+      <p>This is where agent circuit breakers differ from their distributed systems counterparts. A microservice failure is binary — the HTTP call either succeeds or fails. An agent sub-call can fail in several ways:</p>
+      <p><strong>Hard failures:</strong> The tool throws an exception. The API returns a 5xx. The model call times out. The sub-agent returns a malformed response that the orchestrator cannot parse.</p>
+      <p><strong>Soft failures:</strong> The sub-agent returns a response, but the response quality is below threshold. The orchestrator's validator rejects the output. The sub-agent completes but reports low confidence. The output contradicts a known constraint.</p>
+      <p>Hard failures are easier to detect. Soft failures require the orchestrator to have quality validation logic — and the quality threshold must be defined before the circuit breaker can use it. For most production systems, start by handling hard failures and add soft failure detection incrementally as you understand your system's failure modes.</p>
+
+      <hr />
+
+      <h2>Fallback Paths</h2>
+      <p>A circuit breaker without a fallback is just a faster way to fail. The value of the pattern is in what the orchestrator does when the breaker is open.</p>
+      <p>Common fallback patterns for agent sub-calls:</p>
+      <p><strong>Degrade gracefully.</strong> Skip the sub-agent's output and proceed with the workflow using the information already gathered. The final output is less complete but still useful. Appropriate when the sub-agent's contribution is enhancement rather than essential.</p>
+      <p><strong>Route to an alternative provider.</strong> If the primary LLM is failing, route to a backup model. If the primary search tool is down, use a different search provider. Multi-provider orchestration is the prerequisite for this pattern.</p>
+      <p><strong>Cache the last known good result.</strong> If the sub-agent is providing stable reference information (a product catalog lookup, a configuration value), serve the cached result while the sub-agent recovers. Appropriate only when staleness is acceptable for the use case.</p>
+      <p><strong>Escalate to human.</strong> For high-stakes workflows where degraded output is worse than no output, open a human-in-the-loop checkpoint when the breaker opens. The workflow pauses rather than proceeding with incomplete information.</p>
+
+      <hr />
+
+      <h2>Implementation in Practice</h2>
+      <p>Most agent frameworks don't include circuit breaker logic natively. You implement it in the orchestrator layer.</p>
+      <p>The minimal implementation tracks, per sub-agent or tool:</p>
+      <ul>
+        <li>Failure count in the current window</li>
+        <li>Last failure timestamp</li>
+        <li>Current state (closed / open / half-open)</li>
+        <li>Cooldown expiry timestamp</li>
+      </ul>
+      <p>Before every sub-agent call, check state. If open, return the fallback immediately. If half-open, allow the call and update state based on the result. If closed, make the call and update the failure counter.</p>
+      <p>The thresholds — failure count before opening, cooldown duration, number of half-open test calls — should be tuned per sub-agent based on observed failure rates and recovery characteristics. A fast API that occasionally rate-limits needs different settings than a model call that occasionally hallucinates outputs that fail quality validation.</p>
+
+      <hr />
+
+      <h2>The Observability Requirement</h2>
+      <p>Circuit breakers are only useful if you can see when they're tripping. Log every state transition: when the breaker opens, what triggered it, how long it was open, and whether it closed cleanly or was reset manually. Track breaker trip rate per sub-agent over time.</p>
+      <p>A sub-agent whose circuit breaker trips frequently is telling you something: either the sub-agent is unreliable and needs to be replaced, or your failure threshold is miscalibrated and is being triggered by normal variance. You cannot distinguish between these without the observability.</p>
+    `,
+  },
+
+  'partial-failure-retry': {
+    description: 'In multi-step agent workflows, partial failures are the norm. How to checkpoint, retry, and resume without rerunning work that succeeded.',
+    html: `
+      <p>In a single-step API call, failure is simple: the call either succeeds or fails, and a retry is trivially the same as the first attempt.</p>
+      <p>In a multi-step agent workflow, failure is compound. The agent has completed steps one through seven. Step eight fails. A naive retry restarts from step one — re-running seven steps of work, burning token budget, re-querying external systems, and potentially producing different outputs from non-deterministic steps. This is not a retry. It is a full restart that wastes everything that succeeded.</p>
+      <p>Partial failure handling in agent systems requires a different pattern: checkpoint what succeeded, retry only what failed, resume from the last known good state.</p>
+
+      <hr />
+
+      <h2>Why Agents Fail Partially</h2>
+      <p>Multi-step agent workflows fail partially for the same reasons distributed workflows fail partially:</p>
+      <p><strong>Transient tool failures.</strong> A search API rate-limits. A database is briefly unavailable. A model call times out. These failures are often temporary and the correct response is a wait-and-retry, not a restart.</p>
+      <p><strong>Worker crashes.</strong> The process running the agent is interrupted — out-of-memory, infrastructure preemption, network partition. The agent was mid-execution. Some steps completed and wrote outputs. Others were in-flight and are now lost.</p>
+      <p><strong>Validation failures.</strong> A sub-agent's output fails a quality check. The orchestrator needs to retry that specific step with different parameters or a different model, not restart the entire workflow.</p>
+      <p><strong>Budget exhaustion.</strong> The workflow ran out of token budget or time budget partway through. The steps that completed have value. The workflow should be resumable after budget is replenished, not discarded.</p>
+
+      <hr />
+
+      <h2>Checkpointing</h2>
+      <p>Checkpointing is the practice of persisting workflow state at defined points so that execution can resume from a checkpoint rather than from the beginning.</p>
+      <p>For agent workflows, a checkpoint captures:</p>
+      <ul>
+        <li>Which steps have completed and their outputs</li>
+        <li>The current state of all variables in the workflow</li>
+        <li>The pending steps and their inputs</li>
+        <li>Any external state that was modified (records updated, messages sent)</li>
+      </ul>
+      <p>Checkpoints should be written after each step completes, before the next step begins. The checkpoint is the boundary between what is safe to skip on retry and what must be re-executed.</p>
+      <p>Where to store checkpoints depends on the workflow duration and criticality. For short workflows (seconds to minutes), an in-memory store with a write-through to a fast persistence layer (Redis, a database) is sufficient. For long-running workflows (hours to days), durable storage is required — the checkpoint must survive process restarts.</p>
+
+      <hr />
+
+      <h2>Per-Step Retry Policies</h2>
+      <p>Not all steps should have the same retry policy. The retry strategy for a step should match the failure characteristics of that step.</p>
+      <p><strong>Transient failures (network timeouts, rate limits):</strong> Exponential backoff with jitter. Wait before retrying to avoid thundering herd. Maximum retry count with a final fallback if all retries are exhausted.</p>
+      <p><strong>Quality validation failures:</strong> Retry with modified parameters. If a model call produced output that failed quality validation, retrying with identical inputs often produces the same bad output. Instead, modify the prompt, adjust the temperature, or route to a different model before retrying.</p>
+      <p><strong>Deterministic failures (invalid inputs, schema violations):</strong> Do not retry. These failures will not resolve on retry because the inputs are wrong. Surface the error and require a fix before retrying.</p>
+      <p><strong>Idempotent vs. non-idempotent steps:</strong> Steps that can safely be re-executed (read operations, idempotent writes) can be retried aggressively. Steps that are not idempotent (sending a notification, charging a payment, deleting a record) must be tracked via checkpoint so they are not re-executed if already completed.</p>
+
+      <hr />
+
+      <h2>Lease Release on Worker Crash</h2>
+      <p>A specific failure mode that requires special handling: the worker process crashes mid-step. The step was in-flight — not completed, but also not cleanly failed. The next worker to pick up the workflow needs to know: did that step complete, or is it safe to retry?</p>
+      <p>The lease pattern handles this. When a worker begins executing a step, it acquires a lease on that step — a time-bounded lock that indicates "this step is being executed." If the worker completes the step, it commits the checkpoint and releases the lease. If the worker crashes, the lease expires after a timeout, and the step becomes available for retry by a different worker.</p>
+      <p>The timeout must be longer than the step's expected execution time — a step that takes 30 seconds needs a lease longer than 30 seconds. Setting the lease timeout too short causes valid in-progress executions to be retried by a second worker, potentially producing duplicate effects.</p>
+
+      <hr />
+
+      <h2>The Non-Idempotency Problem</h2>
+      <p>The hardest partial failure scenario involves non-idempotent actions: the agent sent an email, wrote to a database, or called an external API at some point in the workflow. The worker crashed. On retry, should the agent re-execute that step?</p>
+      <p>The checkpoint is the source of truth. If the checkpoint records the step as completed before the crash, the retry skips it. If the checkpoint records the step as in-flight, the retry must determine whether the action actually happened — often by querying the external system — before deciding whether to re-execute.</p>
+      <p>For high-stakes non-idempotent actions, the safest design is to record intent before execution ("I am about to send this email") and outcome after execution ("This email was sent, message ID: X") as separate checkpoint entries. A retry can then safely skip a step whose outcome was recorded, and re-execute a step whose intent was recorded but outcome was not.</p>
+
+      <hr />
+
+      <h2>LangGraph's Approach</h2>
+      <p>LangGraph implements a form of this pattern natively through persistent checkpointers. Each node in a LangGraph graph writes its output to the checkpoint store before the next node executes. If execution is interrupted, the graph resumes from the last committed checkpoint rather than restarting. The built-in checkpointers support SQLite (for local development) and Postgres (for production). This is one of the reasons LangGraph is well-suited to long-running agentic workflows — the checkpointing architecture handles partial failure without requiring the developer to implement it manually.</p>
+    `,
+  },
+
+  'hallucination-multi-agent': {
+    description: 'Hallucination in multi-agent systems is not just a model quality problem. It is an architectural problem. Here is where it originates and how to contain it.',
+    html: `
+      <p>Hallucination in a single LLM call is a known problem with known mitigations: retrieval augmentation, structured outputs, temperature control, post-hoc fact-checking. The model generates something incorrect, you catch it, you fix the prompt or the retrieval.</p>
+      <p>Hallucination in a multi-agent system is different. It is not just a model quality problem. It is an architectural problem — one where the structure of the system can amplify and propagate a single model error into a compounding chain of confident wrongness that is invisible until the final output arrives.</p>
+
+      <hr />
+
+      <h2>Why Multi-Agent Hallucination Is Worse</h2>
+      <p>In a single-agent system, the hallucination is isolated. The model produced something wrong. You inspect the output, identify the error, trace it to a prompt or retrieval issue, and fix it.</p>
+      <p>In a multi-agent system, the hallucination propagates. Agent A produces a wrong output. Agent B receives that output as input, treats it as a verified fact, and builds on it. Agent C receives Agent B's output, which has now compounded the error. By the time the final output reaches a human, the original hallucination is buried under several layers of downstream reasoning that all look internally consistent.</p>
+      <p>This is the error amplification problem. It is not about any individual model's quality — it is about what happens when outputs from one model become the inputs for another without a verification step between them.</p>
+
+      <hr />
+
+      <h2>The Three Sources in Multi-Agent Systems</h2>
+
+      <h3>1. Context contamination</h3>
+      <p>As an agent workflow progresses, the context window accumulates. Tool results, prior reasoning steps, sub-agent outputs — all of it builds up. In long workflows, earlier context can crowd out or contradict later context. The model is reasoning over a large, potentially inconsistent context window and making a coherence judgment across it.</p>
+      <p>Hallucinations often emerge at this boundary: the model synthesizes conflicting signals in the context window into a plausible-sounding but incorrect claim. The longer the context, the higher the chance of this synthesis failure.</p>
+
+      <h3>2. Tool output misinterpretation</h3>
+      <p>When an agent calls a tool, it receives a response in whatever format the tool produces. The model interprets that response and incorporates it into its reasoning. If the tool response is ambiguous, uses domain-specific formatting, or returns an unexpected schema, the model may misinterpret it — treating an error message as a valid result, misreading a numeric field, or conflating two similar-sounding fields.</p>
+      <p>The model does not have uncertainty about its interpretation of the tool response. It treats its interpretation as correct and proceeds. If the interpretation is wrong, every subsequent step built on it is wrong.</p>
+
+      <h3>3. Instruction drift in long workflows</h3>
+      <p>An agent starts with a clear goal. As the workflow progresses and the context window fills, the original instruction can become less salient relative to the accumulated context. The agent begins to optimize for the most recent context rather than the original goal — a form of hallucination where the agent's behavior drifts from its mandate without any single step being clearly wrong.</p>
+
+      <hr />
+
+      <h2>Architectural Mitigations</h2>
+
+      <h3>Centralized manager with validation gates</h3>
+      <p>In a peer-to-peer multi-agent topology, agents pass outputs directly to each other. Each agent trusts the previous agent's output. Error amplification is unbounded.</p>
+      <p>A centralized manager pattern inserts a validation step between sub-agent outputs and downstream inputs. The manager receives an output, applies validation logic, and either passes it forward (if valid) or routes to a correction step (if not). The manager is the circuit breaker for hallucinated sub-agent outputs.</p>
+      <p>The cost is latency — every output goes through the manager before proceeding. The benefit is that errors are caught at the source rather than compounding through the pipeline.</p>
+
+      <h3>Output schema enforcement</h3>
+      <p>Model outputs that are free-form prose are harder to validate than outputs with enforced schemas. A sub-agent that is required to return a JSON object with specific fields is easier to validate: are the fields present? Do the values have the expected types? Are the claims within the expected range?</p>
+      <p>Structured outputs — using JSON mode, tool use, or output parsers — are one of the most effective architectural mitigations for hallucination in multi-agent systems. They convert free-form generation into testable structured data.</p>
+
+      <h3>Source attribution requirements</h3>
+      <p>Require sub-agents to attribute claims to sources. "The customer's last purchase was $340" is harder to validate than "The customer's last purchase was $340 (source: CRM query, customer ID 12345, retrieved 14:22 UTC)." Attribution forces the model to ground its output in a traceable source rather than synthesizing from training data or prior context.</p>
+      <p>Attribution also enables post-hoc validation: you can check whether the cited source actually supports the claim. In a customer-facing system where factual accuracy is critical, source attribution is not just a nice-to-have — it is the mechanism that makes hallucination detectable.</p>
+
+      <h3>Context compression between steps</h3>
+      <p>Instead of passing the full accumulated context from one step to the next, compress the context to the relevant summary before the handoff. The receiving agent gets a clean, compressed summary of what has been learned so far — not a raw concatenation of all prior tool outputs and reasoning steps.</p>
+      <p>Compression reduces context contamination risk. It also reduces token cost. The tradeoff is compression quality — a bad summarization step can lose information that turns out to be relevant. Test compression prompts carefully and retain the full context in storage for auditability even when compressing for active reasoning.</p>
+
+      <hr />
+
+      <h2>The Eval Implication</h2>
+      <p>Evaluating hallucination in multi-agent systems requires more than checking the final output. You need to check intermediate outputs as well — specifically the outputs that will become inputs for downstream agents.</p>
+      <p>A hallucination at step three that produces a correct-looking final output (because downstream agents happened to compensate for the error) will not be caught by final-output evals. It will appear in production as an intermittent correctness problem that is difficult to reproduce because it depends on the specific path through the system.</p>
+      <p>Intermediate output validation is the eval counterpart to the manager validation pattern. Build it into your eval framework, not just your production monitoring.</p>
+    `,
+  },
+
+  'observability-trace-ids': {
+    description: 'When an agent workflow fails, you need to know which step, which model call, which tool invocation. Trace IDs across agent chains are how you get there.',
+    html: `
+      <p>Observability in single-service systems is relatively straightforward. A request comes in, you assign it a trace ID, you log every operation with that ID, you can reconstruct the full request path from the logs.</p>
+      <p>In multi-agent systems, observability is harder. A user request triggers an orchestrator. The orchestrator spawns three sub-agents. One sub-agent calls two tools and makes one model call. Another sub-agent calls a database and invokes a second model. All of this happens concurrently, across potentially different processes or services, with different timing and different failure modes.</p>
+      <p>Without a structured tracing system, you have logs from six different components with no way to connect them. When something fails, you know something failed. You do not know what, or where, or why.</p>
+
+      <hr />
+
+      <h2>The Trace Hierarchy for Agent Systems</h2>
+      <p>Agent systems have a natural nesting structure: the workflow contains steps; each step may contain model calls, tool calls, and sub-agent invocations; sub-agents contain their own steps. Effective observability preserves this hierarchy in the trace structure.</p>
+      <p>The standard approach, borrowed from distributed tracing (OpenTelemetry), maps cleanly onto agent hierarchies:</p>
+      <ul>
+        <li><strong>Trace ID</strong> — identifies the entire workflow, from initial user request to final output. Assigned at the workflow entry point and propagated to every component.</li>
+        <li><strong>Span ID</strong> — identifies a single unit of work within the trace. Each step, model call, and tool call gets its own span.</li>
+        <li><strong>Parent Span ID</strong> — the span that spawned this span. This is what creates the hierarchy: the orchestrator's span is the parent of each sub-agent's span; each sub-agent's span is the parent of its model calls and tool calls.</li>
+      </ul>
+      <p>With this structure, you can reconstruct the complete execution tree for any workflow run: what ran, in what order, how long each step took, and where failures occurred.</p>
+
+      <hr />
+
+      <h2>What to Capture Per Span</h2>
+      <p>Each span should capture enough to reconstruct what happened and diagnose what went wrong:</p>
+      <p><strong>For model calls:</strong> model name and version, input token count, output token count, latency (time to first token, total latency), finish reason (stop / length / tool_use / error), temperature and sampling parameters. For debugging, the full prompt and completion — though this has cost and privacy implications that must be weighed.</p>
+      <p><strong>For tool calls:</strong> tool name, input parameters, output (truncated if large), latency, success or error. The tool inputs and outputs are often the most useful debugging information — a wrong tool input explains most tool-related failures.</p>
+      <p><strong>For sub-agent invocations:</strong> sub-agent name, task description, input context size, output size, whether the sub-agent succeeded or was retried, the trace ID of the sub-agent's own trace (for cross-trace correlation).</p>
+      <p><strong>For orchestrator steps:</strong> step name, which sub-agents or tools were invoked, decision rationale (if the orchestrator made a routing decision), intermediate state.</p>
+
+      <hr />
+
+      <h2>Trace ID Propagation</h2>
+      <p>The trace ID is only useful if it is propagated consistently to every component in the system. This is the part that breaks most often in practice.</p>
+      <p>Common failure modes:</p>
+      <p><strong>Sub-agents that start a new trace instead of inheriting the parent trace.</strong> If a sub-agent library auto-generates a new trace ID, you lose the connection between the sub-agent's spans and the orchestrator's trace. You can see what the sub-agent did in isolation, but you cannot connect it to the user request that triggered it.</p>
+      <p><strong>Tool calls that don't propagate the trace ID.</strong> If tool wrappers don't include the current span ID in their logging, tool call spans appear as standalone events rather than as children of the step that invoked them.</p>
+      <p><strong>Async operations that lose the trace context.</strong> When steps run asynchronously — spawning background tasks, using queues, calling webhooks — the trace context must be explicitly serialized and passed along. Async operations that inherit context automatically from a synchronous call stack will lose it when the stack unwinds.</p>
+      <p>The fix is explicit trace context management: pass the trace ID and parent span ID explicitly through every function call, API call, and message queue publish rather than relying on implicit thread-local context propagation.</p>
+
+      <hr />
+
+      <h2>Production Sampling Strategy</h2>
+      <p>Capturing full traces for every workflow in production is expensive. Token counts, model inputs and outputs, and tool call payloads add up quickly at scale.</p>
+      <p>A practical sampling strategy:</p>
+      <p><strong>Always capture:</strong> Span start/end timestamps, span IDs and parent IDs, success/failure status, error messages, token counts, latency. This is the minimal trace that allows you to reconstruct the execution graph and identify failures.</p>
+      <p><strong>Sample at low rate (1–5%):</strong> Full prompt and completion text, tool call payloads. This gives you enough examples for debugging and eval without logging every model call in full.</p>
+      <p><strong>Always capture on failure:</strong> When a span fails or produces an unexpected result, capture the full context regardless of the sampling rate. Failures are rare enough that the cost is manageable, and the full context is what you need for debugging.</p>
+
+      <hr />
+
+      <h2>Connecting Traces to Evals</h2>
+      <p>Traces are the foundation of production eval pipelines. An LLM-as-judge eval needs the model's input and output for a given call. A task completion eval needs the complete execution trace to verify that every required step ran and produced an acceptable output.</p>
+      <p>Storing traces in a queryable format — not just log lines — enables you to:</p>
+      <ul>
+        <li>Sample traces for offline eval runs by filtering on specific criteria (high latency, specific tool calls, failure paths)</li>
+        <li>Track eval metrics over time by attaching eval results to the corresponding trace</li>
+        <li>Build regression tests from specific failing traces — capture the trace, annotate what went wrong, add it to the eval suite</li>
+      </ul>
+      <p>LangSmith, Langfuse, and Arize AI all provide purpose-built trace storage and query interfaces for LLM systems. OpenTelemetry-compatible backends (Jaeger, Honeycomb, Datadog APM) work for teams that want to integrate agent traces into existing observability infrastructure.</p>
+      <p>The most important decision is not which tool to use. It is to make the trace hierarchy explicit and consistent before you need it to debug a production failure.</p>
+    `,
+  },
+
+  'audit-trails-agents': {
+    description: 'Audit trails for autonomous systems must capture more than logs. For regulated industries and high-stakes deployments, here is what an actionable audit trail looks like.',
+    html: `
+      <p>Most production systems have logs. Logs are not audit trails.</p>
+      <p>A log records what happened: timestamps, events, errors, system state. An audit trail records what happened, who caused it, why it was authorized, and what changed as a result. For a human operator, the distinction is between a server log and a compliance record. For an autonomous agent, the distinction is between observability and accountability.</p>
+      <p>In regulated industries — financial services, healthcare, legal, government — the audit trail is a compliance requirement. Agents that take actions on behalf of users or enterprises must be able to demonstrate what they did, what information they used, and what authorization they had. In unregulated industries, the audit trail is a trust requirement: enterprise customers will not deploy autonomous agents unless they can verify agent behavior after the fact.</p>
+
+      <hr />
+
+      <h2>What an Audit Trail Must Answer</h2>
+      <p>An effective audit trail for an autonomous agent system must be able to answer six questions about any agent action:</p>
+      <p><strong>What did the agent do?</strong> The specific action: which record was written, which message was sent, which API was called, which decision was made. Not a summary — the exact action.</p>
+      <p><strong>When did it happen?</strong> Precise timestamp at the operation level, not the workflow level. The audit trail for a workflow that ran 47 tool calls needs timestamps for each tool call, not just the workflow start and end.</p>
+      <p><strong>What information did the agent use to decide?</strong> The inputs to the decision: which data was retrieved, which documents were in context, which prior step outputs informed the current step. For LLM-based decisions, this is the prompt and the relevant context — not the full raw context window, but the information that was material to the decision.</p>
+      <p><strong>What authorization did the agent have?</strong> Which permissions were in scope for this action. Which user's authorization was the agent acting under. Whether the action was within the scope of the original user request or was an autonomous extension of scope.</p>
+      <p><strong>Was a human aware?</strong> Whether the action was reviewed by a human before execution, whether a human was notified after execution, or whether the action was fully autonomous with no human in the loop.</p>
+      <p><strong>What was the outcome?</strong> Whether the action succeeded, failed, or was partially completed. What the downstream state looks like after the action. What can be verified independently.</p>
+
+      <hr />
+
+      <h2>Audit Trail vs. Operational Log</h2>
+      <p>An operational log records system events for debugging and performance monitoring. It is optimized for engineers. It answers: what is happening, and why is the system slow or broken?</p>
+      <p>An audit trail records agent actions for accountability and compliance. It is optimized for auditors, compliance officers, and customers. It answers: what did the agent do on behalf of this customer, and was it appropriate?</p>
+      <p>These have different requirements:</p>
+      <p><strong>Operational logs</strong> can be compressed, sampled, and aged out. High-volume, low-retention, structured for machine processing.</p>
+      <p><strong>Audit trails</strong> must be complete (no sampling), durable (retained for the required compliance period — often 3–7 years in regulated industries), tamper-evident (immutable after write), and queryable by non-engineers (compliance teams need to investigate agent behavior without writing SQL).</p>
+      <p>Building one system to serve both purposes usually means compromising both. They should be designed separately.</p>
+
+      <hr />
+
+      <h2>The Minimal Audit Record</h2>
+      <p>At minimum, each agent action should produce an audit record containing:</p>
+      <ul>
+        <li>Action ID (unique, immutable)</li>
+        <li>Workflow ID and step ID (links to the trace)</li>
+        <li>Timestamp (precise, UTC)</li>
+        <li>Actor (which agent, which agent version, which user's authorization was used)</li>
+        <li>Action type (tool call, model call, data write, message send, etc.)</li>
+        <li>Target (which system, which record, which recipient)</li>
+        <li>Authorization scope (what permissions were in effect)</li>
+        <li>Inputs (what data was used)</li>
+        <li>Outcome (success / failure / partial, and the resulting state change)</li>
+        <li>Human oversight indicator (reviewed / notified / autonomous)</li>
+      </ul>
+      <p>For regulated industries, extend this with: the specific regulatory basis for the action (if applicable), the data classification of any data accessed or modified, and the consent status of any customer whose data was involved.</p>
+
+      <hr />
+
+      <h2>Tamper Evidence</h2>
+      <p>An audit trail that can be modified after the fact is not an audit trail. For compliance contexts, the audit record must be immutable: once written, it cannot be edited or deleted.</p>
+      <p>Implementation approaches:</p>
+      <p><strong>Append-only storage:</strong> Use a storage system that enforces append-only semantics — object storage with versioning and deletion prevention, a write-once database, or a dedicated audit log service.</p>
+      <p><strong>Cryptographic chaining:</strong> Each audit record includes a hash of the previous record. Modification of any record in the chain breaks the hash chain and is detectable. This is the approach used by blockchain ledgers and is also applicable without a full blockchain implementation.</p>
+      <p><strong>Third-party attestation:</strong> In the highest-stakes compliance contexts, audit records are signed and submitted to an independent third party. This provides evidence that the audit trail existed at a given point in time and has not been modified since.</p>
+      <p>For most enterprise deployments, append-only storage with versioning is sufficient. Cryptographic chaining adds complexity without proportional benefit unless the threat model includes modification by a privileged insider.</p>
+
+      <hr />
+
+      <h2>The On-Premises Dimension</h2>
+      <p>For regulated industries deploying agents on-premises with self-hosted models, the audit trail must be entirely within the enterprise perimeter. This means:</p>
+      <ul>
+        <li>Audit records are never sent to external logging services</li>
+        <li>The model's inputs and outputs are logged to internal systems only</li>
+        <li>The audit system itself is subject to the same access controls as the data it records</li>
+      </ul>
+      <p>This is one of the reasons on-premises LLM deployment matters for regulated industries beyond data residency. The audit trail for a model call that processes a patient record or a legal document must stay inside the perimeter just as the model call itself must. A cloud-hosted LLM with a cloud-hosted audit trail does not satisfy this requirement regardless of contractual assurances.</p>
+    `,
+  },
+
+  'sdk-comparison': {
+    description: 'Claude SDK, LangGraph, and CrewAI solve different problems. Here is the honest tradeoff analysis for choosing between them in production.',
+    html: `
+      <p>The choice between Claude SDK, LangGraph, and CrewAI is not primarily a capability question. All three can build sophisticated agentic systems. The question is which one's abstractions fit your use case — and, more importantly, which abstractions will become obstacles when your requirements change.</p>
+      <p>Anthropic's own engineering guidance is explicit on this: "incorrect assumptions about what's under the hood are a common source of customer error." The implication is that choosing a framework without understanding its internal model leads to systems that fail in ways you didn't predict. Understanding the abstractions before you commit to them is the prerequisite to using them correctly.</p>
+
+      <hr />
+
+      <h2>Claude SDK (Anthropic SDK)</h2>
+      <p><strong>What it is:</strong> A direct API client for Claude. No orchestration abstractions, no graph constructs, no role-based agents. You call the model, you handle the response, you decide what to do next.</p>
+      <p><strong>The model:</strong> You are writing the orchestration logic. The SDK handles authentication, request formatting, streaming, and error handling. Everything else — what to do with the response, when to call a tool, how to handle a multi-step workflow — is your code.</p>
+      <p><strong>Strengths:</strong></p>
+      <ul>
+        <li>No hidden behavior. What you see is what runs.</li>
+        <li>Maximum control over every aspect of the agent loop.</li>
+        <li>No framework-specific abstractions to learn or debug around.</li>
+        <li>Easiest to integrate into existing codebases without architectural changes.</li>
+        <li>Cheapest to run — no framework overhead.</li>
+      </ul>
+      <p><strong>Weaknesses:</strong></p>
+      <ul>
+        <li>You implement everything. State management, retry logic, checkpointing, concurrency — all of it is your responsibility.</li>
+        <li>No built-in visualization or debugging tools for workflow structure.</li>
+        <li>For complex multi-step workflows, the orchestration code can become difficult to maintain without explicit structure.</li>
+      </ul>
+      <p><strong>Right for:</strong> Teams with strong Python engineering capability who want full control. Simple agent loops where a framework adds more complexity than it removes. Existing applications adding AI capabilities where you don't want to change your architecture.</p>
+
+      <hr />
+
+      <h2>LangGraph</h2>
+      <p><strong>What it is:</strong> A graph-based orchestration framework where workflows are defined as stateful graphs with explicit nodes (steps) and edges (transitions). State is persisted between nodes. The graph structure is explicit and inspectable.</p>
+      <p><strong>The model:</strong> You define a graph. Each node is a function. The orchestrator moves through the graph, passing state from node to node according to the edges you defined. The LLM is called within nodes — it is a component of the graph, not the controller of the graph.</p>
+      <p><strong>Strengths:</strong></p>
+      <ul>
+        <li>Explicit control flow. You know exactly what path the workflow can take — you drew the graph.</li>
+        <li>Built-in checkpointing and persistence. LangGraph checkpointers (SQLite, Postgres) provide durable state management and retry from checkpoint out of the box.</li>
+        <li>Debuggable. The graph structure makes it easy to trace what happened and why.</li>
+        <li>Supports both fully deterministic workflows (explicit edges only) and agent loops (conditional edges where the LLM's output determines the next node).</li>
+        <li>LangSmith integration provides production tracing, eval, and monitoring.</li>
+      </ul>
+      <p><strong>Weaknesses:</strong></p>
+      <ul>
+        <li>Learning curve. The graph/node/edge model is unfamiliar to developers coming from procedural or functional patterns.</li>
+        <li>Framework overhead. For simple use cases, the graph abstraction is more than you need.</li>
+        <li>LangChain ecosystem dependency. LangGraph is part of the LangChain ecosystem — you're taking on that dependency.</li>
+        <li>State schema design is non-trivial. Poorly designed state schemas become technical debt quickly.</li>
+      </ul>
+      <p><strong>Right for:</strong> Long-running, stateful workflows where checkpoint and resume is a requirement. Complex multi-step agent systems where you need explicit control flow and production-grade observability. Teams willing to invest in the framework's abstractions.</p>
+
+      <hr />
+
+      <h2>CrewAI</h2>
+      <p><strong>What it is:</strong> A role-based multi-agent framework. You define agents with roles ("researcher", "analyst", "writer"), assign tasks, and CrewAI orchestrates how the agents collaborate. The focus is on multi-agent coordination with a human-readable role structure.</p>
+      <p><strong>The model:</strong> You think in terms of agents and tasks. The framework handles how agents communicate, how tasks are assigned and completed, and how results are aggregated. The orchestration logic is inside the framework.</p>
+      <p><strong>Strengths:</strong></p>
+      <ul>
+        <li>High-level abstraction makes multi-agent workflows fast to prototype.</li>
+        <li>Role-based structure is intuitive — easy to explain to non-technical stakeholders.</li>
+        <li>Built-in handling for agent communication and task delegation.</li>
+        <li>Good for teams that want to move quickly and are comfortable with the framework making orchestration decisions.</li>
+      </ul>
+      <p><strong>Weaknesses:</strong></p>
+      <ul>
+        <li>Less control over orchestration. The framework makes decisions about agent communication and task assignment. When those decisions are wrong for your use case, it is harder to override them.</li>
+        <li>Harder to debug. The high-level abstractions hide what is happening at the model call level.</li>
+        <li>Framework-specific mental model. Your code is written in CrewAI concepts — migrating to a different framework later means rewriting the orchestration layer.</li>
+        <li>Less mature production tooling than LangGraph for checkpointing, tracing, and eval.</li>
+      </ul>
+      <p><strong>Right for:</strong> Prototyping multi-agent systems quickly. Use cases where the role-based structure maps naturally to the domain. Teams that prioritize development speed over production-grade control.</p>
+
+      <hr />
+
+      <h2>The Decision Framework</h2>
+      <p>Three questions determine the right choice:</p>
+      <p><strong>How much control do you need over the orchestration?</strong> If you need to know exactly what runs when and why — for compliance, for debugging, for cost control — LangGraph or raw SDK. If you're comfortable with the framework making orchestration decisions, CrewAI.</p>
+      <p><strong>How important is production reliability?</strong> For systems where partial failure, checkpoint-resume, and long-running workflows are requirements, LangGraph. For prototypes and short-lived workflows, any of the three.</p>
+      <p><strong>How complex is the workflow structure?</strong> Simple, mostly sequential workflows: raw SDK. Complex, stateful, conditional workflows: LangGraph. Multi-agent coordination with role-based structure: CrewAI (for prototyping) or LangGraph with explicit agent nodes (for production).</p>
+      <p>The pattern that works in practice: prototype with CrewAI or raw SDK to validate the workflow design quickly, then migrate to LangGraph for production where persistence, observability, and explicit control flow are worth the investment. Don't start with LangGraph if you're still figuring out what the workflow should do.</p>
+    `,
+  },
+
   'identity-resolution-three-layer-stack': {
     description: 'Three systems — ad exposure logs, device graphs, and your CRM — that do not know about each other. Identity resolution is the infrastructure that connects them. Here is how to build the three-layer stack and where most implementations break.',
     html: `

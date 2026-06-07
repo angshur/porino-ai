@@ -23,7 +23,7 @@ export const patternsLibrary = [
           { title: 'Fan-Out / Fan-In: Parallelizing Agent Work', slug: 'fan-out-fan-in', status: 'planned' },
           { title: 'Designing Idempotent Agent Tasks', slug: 'idempotent-agent-tasks', status: 'planned' },
           { title: 'Context Propagation Without Blowing Token Budgets', slug: 'context-propagation', status: 'planned' },
-          { title: 'Circuit Breakers for Unreliable Sub-Agents', slug: 'circuit-breakers-sub-agents', status: 'planned' },
+          { title: 'Circuit Breakers for Unreliable Sub-Agents', slug: 'circuit-breakers-sub-agents', status: 'published' },
           { title: 'Agent Pooling: Load Balancing Across Agent Instances', slug: 'agent-pooling', status: 'planned' },
           { title: 'Context Isolation: Spawning Agents With Fresh State', slug: 'context-isolation', status: 'planned' },
         ],
@@ -44,9 +44,9 @@ export const patternsLibrary = [
         articles: [
           { title: 'How the Orchestrator Knows the Sub-Agent Did It Right', slug: 'orchestrator-evaluation', status: 'planned' },
           { title: 'When More Agents Makes Things Worse', slug: 'when-more-agents-makes-things-worse', status: 'published' },
-          { title: 'Hallucination in Multi-Agent Systems (It\'s Not Just the Model)', slug: 'hallucination-multi-agent', status: 'planned' },
-          { title: 'Partial Failure Handling and Retry Strategies', slug: 'partial-failure-retry', status: 'planned' },
-          { title: 'Observability: Trace IDs Across Agent Chains', slug: 'observability-trace-ids', status: 'planned' },
+          { title: 'Hallucination in Multi-Agent Systems (It\'s Not Just the Model)', slug: 'hallucination-multi-agent', status: 'published' },
+          { title: 'Partial Failure Handling and Retry Strategies', slug: 'partial-failure-retry', status: 'published' },
+          { title: 'Observability: Trace IDs Across Agent Chains', slug: 'observability-trace-ids', status: 'published' },
         ],
       },
       {
@@ -54,7 +54,7 @@ export const patternsLibrary = [
         slug: 'governance-security',
         articles: [
           { title: 'What Data Can Your Agent Actually See?', slug: 'agent-data-access', status: 'published' },
-          { title: 'Audit Trails for Autonomous Systems', slug: 'audit-trails-agents', status: 'planned' },
+          { title: 'Audit Trails for Autonomous Systems', slug: 'audit-trails-agents', status: 'published' },
           { title: 'Access Control Patterns for Agent Networks', slug: 'access-control-agent-networks', status: 'planned' },
         ],
       },
@@ -75,7 +75,7 @@ export const patternsLibrary = [
         name: 'Stack & Tooling',
         slug: 'stack-tooling',
         articles: [
-          { title: 'Claude SDK vs LangGraph vs CrewAI — Honest Tradeoffs', slug: 'sdk-comparison', status: 'planned' },
+          { title: 'Claude SDK vs LangGraph vs CrewAI — Honest Tradeoffs', slug: 'sdk-comparison', status: 'published' },
           { title: 'When Tool Use Is Enough (You Don\'t Need Agents)', slug: 'when-tool-use-is-enough', status: 'planned' },
           { title: 'Multi-Model Orchestration: Cheap Router, Expensive Executor', slug: 'multi-model-orchestration', status: 'planned' },
         ],
