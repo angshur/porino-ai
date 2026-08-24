@@ -1,8 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
-// Replace with your Formspree form ID from formspree.io
-const CONSULT_FORM_ID = 'YOUR_CONSULT_FORM_ID';
 ---
 
 <Layout title="Consulting" description="Multi-agent systems and data infrastructure consulting.">
@@ -46,12 +43,11 @@ const CONSULT_FORM_ID = 'YOUR_CONSULT_FORM_ID';
           <div class="contact-section">
             <div class="section-label">Book a call</div>
             <p class="contact-desc">30 minutes. Tell me what you're trying to build. I'll tell you honestly whether it makes sense and where the infrastructure gaps are.</p>
-            <form class="form" action={`https://formspree.io/f/${CONSULT_FORM_ID}`} method="POST">
-              <input type="text" name="name" placeholder="Your name" class="input" />
-              <input type="email" name="email" placeholder="your@email.com" class="input" />
-              <input type="text" name="company" placeholder="Company / team" class="input" />
-              <textarea name="message" placeholder="What are you trying to build?" class="textarea" rows="4"></textarea>
-              <input type="hidden" name="_subject" value="New consulting request — Porino" />
+            <form id="consult-form" class="form" method="POST">
+              <input type="text" id="consult-name" name="name" placeholder="Your name" class="input" />
+              <input type="email" id="consult-email" name="email" placeholder="your@email.com" class="input" />
+              <input type="text" id="consult-company" name="company" placeholder="Company / team" class="input" />
+              <textarea id="consult-message" name="message" placeholder="What are you trying to build?" class="textarea" rows="4"></textarea>
               <button type="submit" class="btn-primary">Request a call</button>
             </form>
           </div>
@@ -198,3 +194,21 @@ const CONSULT_FORM_ID = 'YOUR_CONSULT_FORM_ID';
     background-color: var(--color-accent-hover);
   }
 </style>
+
+<script>
+  // No backend endpoint is wired up yet — route to a real mailto instead of
+  // POSTing to a placeholder Formspree ID that would just 404 silently.
+  const form = document.getElementById('consult-form') as HTMLFormElement | null;
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = (document.getElementById('consult-name') as HTMLInputElement)?.value || '';
+    const email = (document.getElementById('consult-email') as HTMLInputElement)?.value || '';
+    const company = (document.getElementById('consult-company') as HTMLInputElement)?.value || '';
+    const message = (document.getElementById('consult-message') as HTMLTextAreaElement)?.value || '';
+    const subject = encodeURIComponent('New consulting request — Porino');
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\nCompany/team: ${company}\n\nWhat they're building:\n${message}`
+    );
+    window.location.href = `mailto:angshuman.rudra@gmail.com?subject=${subject}&body=${body}`;
+  });
+</script>

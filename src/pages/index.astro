@@ -149,7 +149,7 @@ const categories = [
           </p>
         </div>
         <div class="session-form-wrap">
-          <form id="clarity-form" class="session-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+          <form id="clarity-form" class="session-form" method="POST">
             <div class="form-field">
               <label for="sess-name" class="form-label">Name</label>
               <input type="text" id="sess-name" name="name" required class="form-input" placeholder="Your name" />
@@ -180,10 +180,13 @@ const categories = [
           <h3 class="newsletter-title">Written for people who build, not people who demo.</h3>
           <p class="newsletter-desc">New patterns and research when there's something worth saying.</p>
         </div>
-        <form class="newsletter-form">
+        <form id="newsletter-form" class="newsletter-form">
           <input type="email" placeholder="your@email.com" class="newsletter-input" />
           <button type="submit" class="newsletter-btn">Subscribe</button>
         </form>
+        <p id="newsletter-note" style="display:none; font-size: 0.85rem; opacity: 0.75; margin-top: 8px;">
+          Newsletter isn't live yet — it'll launch alongside the Substack. Check back soon.
+        </p>
       </div>
     </div>
   </section>
@@ -693,17 +696,30 @@ const categories = [
   const form = document.getElementById('clarity-form') as HTMLFormElement | null;
   const success = document.getElementById('form-success');
 
-  form?.addEventListener('submit', async (e) => {
+  // No backend endpoint is wired up yet — route to a real mailto instead of
+  // silently failing against a placeholder Formspree ID. Swap this for a
+  // real POST endpoint (Formspree or otherwise) once one exists.
+  form?.addEventListener('submit', (e) => {
     e.preventDefault();
     const data = new FormData(form!);
-    const response = await fetch(form!.action, {
-      method: 'POST',
-      body: data,
-      headers: { Accept: 'application/json' },
-    });
-    if (response.ok) {
-      form!.style.display = 'none';
-      if (success) success.style.display = 'block';
-    }
+    const name = (data.get('name') || '').toString();
+    const email = (data.get('email') || '').toString();
+    const question = (data.get('question') || '').toString();
+    const subject = encodeURIComponent('Architecture Clarity Session request');
+    const body = encodeURIComponent(
+      `Name: ${name}\nEmail: ${email}\n\nWhat I'm trying to figure out:\n${question}`
+    );
+    window.location.href = `mailto:angshuman.rudra@gmail.com?subject=${subject}&body=${body}`;
+    form!.style.display = 'none';
+    if (success) success.style.display = 'block';
+  });
+
+  // No newsletter/Substack infra exists yet — say so instead of a form that
+  // silently reloads the page on submit.
+  const newsletterForm = document.getElementById('newsletter-form') as HTMLFormElement | null;
+  const newsletterNote = document.getElementById('newsletter-note');
+  newsletterForm?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (newsletterNote) newsletterNote.style.display = 'block';
   });
 </script>
